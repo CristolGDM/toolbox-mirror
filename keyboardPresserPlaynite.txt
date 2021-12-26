@@ -1,0 +1,7 @@
+Press {ENTER} for 0 seconds Pause 4000      Milliseconds
+Press {RIGHT} for 0 seconds Pause 500     Milliseconds
+Press {ENTER} for 0 seconds Pause 500      Milliseconds
+Press {ENTER} for 0 seconds Pause 500      Milliseconds
+Press Alt+s for 0 seconds Pause 500      Milliseconds
+Press x for 0 seconds Pause 4000   Milliseconds
+Press {DOWN} for 0 seconds Pause 2000      Milliseconds

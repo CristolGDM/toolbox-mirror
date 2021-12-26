@@ -1,0 +1,13 @@
+const doc = document.getElementsByClassName("wiki-item-display js-toc-content")[0];
+const title = document.querySelectorAll("h3.display-view")[0];
+doc.insertBefore(title, doc.firstChild);
+const captions = doc.getElementsByTagName("figcaption");
+for(let caption of captions) {caption.style.display = "block";};
+const images = doc.getElementsByTagName("img");
+for(let image of images) {image.style.display = "inline-block";};
+const noscripts = doc.getElementsByTagName("noscript");
+for(let noscript of noscripts) {
+	const parent = noscript.parentElement;
+	parent.removeChild(noscript);
+};
+navigator.clipboard.writeText(doc.innerHTML);
