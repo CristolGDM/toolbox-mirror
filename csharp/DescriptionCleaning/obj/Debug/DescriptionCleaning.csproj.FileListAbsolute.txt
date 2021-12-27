@@ -1,0 +1,30 @@
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\bin\Debug\extension.yaml
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\bin\Debug\icon.png
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\bin\Debug\DescriptionCleaning.dll
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\bin\Debug\DescriptionCleaning.pdb
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\bin\Debug\Playnite.SDK.dll
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\bin\Debug\Playnite.SDK.xml
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaning.csproj.AssemblyReference.cache
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaningSettingsView.baml
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaningSettingsView.g.cs
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaning_MarkupCompile.cache
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaning.g.resources
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaning.csproj.CoreCompileInputs.cache
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaning.csproj.CopyComplete
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaning.dll
+E:\Documents\scripts\csharp\Playnite description cleaner\DescriptionCleaning\obj\Debug\DescriptionCleaning.pdb
+R:\Playnite\Extensions\DescriptionCleaning\bin\Debug\extension.yaml
+R:\Playnite\Extensions\DescriptionCleaning\bin\Debug\icon.png
+R:\Playnite\Extensions\DescriptionCleaning\bin\Debug\DescriptionCleaning.dll
+R:\Playnite\Extensions\DescriptionCleaning\bin\Debug\DescriptionCleaning.pdb
+R:\Playnite\Extensions\DescriptionCleaning\bin\Debug\Playnite.SDK.dll
+R:\Playnite\Extensions\DescriptionCleaning\bin\Debug\Playnite.SDK.xml
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaning.csproj.AssemblyReference.cache
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaningSettingsView.baml
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaningSettingsView.g.cs
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaning_MarkupCompile.cache
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaning.g.resources
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaning.csproj.CoreCompileInputs.cache
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaning.csproj.CopyComplete
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaning.dll
+R:\Playnite\Extensions\DescriptionCleaning\obj\Debug\DescriptionCleaning.pdb
