@@ -1,7 +1,6 @@
 fs = require("fs");
 https = require("https");
 axios = require("axios");
-sqlite3 = require("sqlite3")
 
 const metadataPath = "R:/Playnite/library/files/";
 const libraryPath = "R:/Playnite/library/games.db";
@@ -9,30 +8,6 @@ const separator = "-------------------------------------------------------------
 
 const compact = true;
 const downloaded = [];
-
-const db = new sqlite3.Database(libraryPath, sqlite3.OPEN_READONLY);
-
-db.serialize(function () {
-    db.all(
-      'SELECT name FROM sqlite_master WHERE type="table"',
-      function (err, rows) {
-        if(err) {
-            console.log(err);
-        }
-        const result = [];
-        if(!rows) {
-            return "Row doesnt exist"
-        }
-        rows.forEach(
-          (table) => db.all('SELECT * FROM ' + table.name),
-          function (err, innerRows) {
-            result.push(innerRows);
-          }
-        );
-        console.log(result)
-      }
-    );
-  });
 
 // fs.readdir(descriptionPath, async (err, files) => {
 //     for (let i = 0; i < files.length; i++) {
