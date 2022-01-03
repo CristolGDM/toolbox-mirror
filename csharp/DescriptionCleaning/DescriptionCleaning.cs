@@ -15,6 +15,7 @@ namespace DescriptionCleaning {
 		private static readonly ILogger logger = LogManager.GetLogger();
 		private static readonly Regex imgSrcRegex = new Regex("(?<=src=\")(.*?)(?=\")");
 		private static readonly Regex removeWhitespaceRegex = new Regex(@"\s+");
+		private static readonly bool writeLogs = true;
 
 		private DescriptionCleaningSettingsViewModel settings { get; set; }
 
@@ -53,6 +54,9 @@ namespace DescriptionCleaning {
 		}
 
 		public void LogMessage(string message) {
+			if(!writeLogs) {
+				return;
+      }
 			logger.Info("**** " + message);
 		}
 
@@ -206,18 +210,23 @@ namespace DescriptionCleaning {
 			int CleanedGames = 0;
 
 			foreach (Game game in PlayniteApi.Database.Games) {
-				string description = game.Description;
-				LogMessage($"cleaning {game.Name}");
+				try {
+					if(game.Hidden) {
+						LogMessage("Skipping hidden game");
+						continue;
+          }
+					string description = game.Description;
+					LogMessage($"cleaning {game.Name}");
 
-				progress.CurrentProgressValue++;
-				progress.Text = $"Cleaning metadata... ({progress.CurrentProgressValue}/{progress.ProgressMaxValue})";
+					progress.CurrentProgressValue++;
+					progress.Text = $"Cleaning metadata... ({progress.CurrentProgressValue}/{progress.ProgressMaxValue})";
 
-				if (description == null) {
-					Error($"{game.Name} has no description");
-					Message(" " + description.Length);
-				}
+					if (description == null) {
+						Error($"{game.Name} has no description");
+						Message(" " + description.Length);
+					}
 
-				string html = @"<!DOCTYPE html>
+					string html = @"<!DOCTYPE html>
 					<html>
 					<body>
 						<p>temp</p>
@@ -225,54 +234,103 @@ namespace DescriptionCleaning {
 					</html> ";
 
 
-				HtmlDocument htmlDoc = new HtmlDocument();
-				htmlDoc.LoadHtml(html);
-				HtmlNode body = htmlDoc.DocumentNode.SelectSingleNode("//body");
-				body.InnerHtml = description;
+					HtmlDocument htmlDoc = new HtmlDocument();
+					htmlDoc.LoadHtml(html);
+					HtmlNode body = htmlDoc.DocumentNode.SelectSingleNode("//body");
+					body.InnerHtml = description;
 
-				if(body.InnerHtml.Length > description.Length * 1.1 || body.InnerHtml.Length < description.Length * 0.9) {
-					Error($"{game.Name}: description has formatting issues");
-					LogMessage("DESCRIPTION ==========================================================");
-					LogMessage("======================================================================");
-					LogMessage("\n" + description);
-					LogMessage("HTML ==========================================================");
-					LogMessage("======================================================================");
-					LogMessage("\n" + body.InnerHtml);
-					throw new Exception($"{game.Name}: description has formatting issues");
-        }
+					if (body.InnerHtml.Length > description.Length * 1.1 || body.InnerHtml.Length < description.Length * 0.9) {
+						Error($"{game.Name}: description has formatting issues");
+						LogMessage("DESCRIPTION ==========================================================");
+						LogMessage("======================================================================");
+						LogMessage("\n" + description);
+						LogMessage("HTML ==========================================================");
+						LogMessage("======================================================================");
+						LogMessage("\n" + body.InnerHtml);
+						throw new Exception($"{game.Name}: description has formatting issues");
+					}
 
-				htmlDoc.DocumentNode.SelectNodes("//noscript").ForEach((node) => node.Remove());
-				htmlDoc.DocumentNode.SelectNodes("//h1").ForEach((node) => node.Attributes.RemoveAll());
-				htmlDoc.DocumentNode.SelectNodes("//h2").ForEach((node) => node.Attributes.RemoveAll());
-				htmlDoc.DocumentNode.SelectNodes("//h3").ForEach((node) => node.Attributes.RemoveAll());
-				htmlDoc.DocumentNode.SelectNodes("//h1").ForEach((node) => node.Attributes.RemoveAll());
-				htmlDoc.DocumentNode.SelectNodes("//figure").ForEach((node) => node.Attributes.RemoveAll());
-				htmlDoc.DocumentNode.SelectNodes("//img").ForEach((node) => { CleanImage(node, getFilesFolderPath(game)); });
+					htmlDoc.DocumentNode.SelectNodes("//noscript").ForEach((node) => node.Remove());
+					//LogMessage("After noscript");
+					htmlDoc.DocumentNode.SelectNodes("//h1").ForEach((node) => node.Attributes.RemoveAll());
+					//LogMessage("After h1");
+					htmlDoc.DocumentNode.SelectNodes("//h2").ForEach((node) => node.Attributes.RemoveAll());
+					//LogMessage("After h2");
+					htmlDoc.DocumentNode.SelectNodes("//h3").ForEach((node) => node.Attributes.RemoveAll());
+					//LogMessage("After h3");
+					htmlDoc.DocumentNode.SelectNodes("//h1").ForEach((node) => node.Attributes.RemoveAll());
+					//LogMessage("After h4");
+					htmlDoc.DocumentNode.SelectNodes("//figure").ForEach((node) => node.Attributes.RemoveAll());
+					//LogMessage("After figure");
+					htmlDoc.DocumentNode.SelectNodes("//img").ForEach((node) => { CleanImage(node, getFilesFolderPath(game)); });
+					//LogMessage("After img");
 
-				htmlDoc.DocumentNode.SelectNodes("//a").ForEach((node) => {
-					HtmlAttributeCollection linkAttributes = node.Attributes;
-
-					foreach (HtmlAttribute attr in linkAttributes.ToList()) {
-						if (attr.Name != "href" && attr.Name != "alt") {
-							node.Attributes[attr.Name].Remove();
+					Boolean descriptionIsFinished = true;
+					if (game.Tags != null) {
+						foreach (Tag tag in game.Tags) {
+							if (tag.Name == "description") {
+								descriptionIsFinished = false;
+								break;
+							}
 						}
 					}
-				});
+					//LogMessage("After tags");
 
-				string result = LastCleanHtml(body.InnerHtml);
+					Tag needsImageTag = PlayniteApi.Database.Tags.FirstOrDefault(x => x.Name == "needsgameplayimage");
+					if (descriptionIsFinished) {
+						if (htmlDoc.DocumentNode.SelectNodes("//img") == null) {
+							if(game.TagIds == null) {
+								game.TagIds = new List<Guid>() { needsImageTag.Id };
+              }
+							else {
+								game.TagIds.Add(needsImageTag.Id);
+							}
+						}
+						else {
+							HtmlNode image = htmlDoc.DocumentNode.SelectNodes("//img")[0];
+							if (image.Attributes["width"] == null) {
+								image.Attributes.Add("width", "100%");
+							}
+							else {
+								image.Attributes["width"].Value = "100%";
+							}
+							if(game.TagIds != null && game.TagIds.Contains(needsImageTag.Id)) {
+								game.TagIds.Remove(needsImageTag.Id);
+              }
+						}
+					}
+					//LogMessage("After width");
 
-				if(result.Length == 0 || removeWhitespaceRegex.Replace(result, "").Length == 0) {
-					throw new Exception("Description is empty");
+					htmlDoc.DocumentNode.SelectNodes("//a").ForEach((node) => {
+						HtmlAttributeCollection linkAttributes = node.Attributes;
+
+						foreach (HtmlAttribute attr in linkAttributes.ToList()) {
+							if (attr.Name != "href" && attr.Name != "alt") {
+								node.Attributes[attr.Name].Remove();
+							}
+						}
+					});
+					LogMessage("After links");
+
+					string result = LastCleanHtml(body.InnerHtml);
+
+					if (result.Length == 0 || removeWhitespaceRegex.Replace(result, "").Length == 0) {
+						throw new Exception("Description is empty");
+					}
+
+					if (result == description) {
+						continue;
+					}
+
+					CleanedGames++;
+					game.Description = result;
+          PlayniteApi.Database.Games.Update(game);
+        }
+        catch (Exception e) {
+					Error(e.ToString());
+					throw (e);
 				}
-
-				if(result == description) {
-					continue;
-				}
-
-				CleanedGames++;
-				game.Description = result;
-        PlayniteApi.Database.Games.Update(game);
-      }
+			}
 
 			Message($"Cleaned {CleanedGames} games");
 		}
@@ -282,29 +340,39 @@ namespace DescriptionCleaning {
 		}
 
 		private void CleanImage(HtmlNode image, string folderPath) {
-			if(image.Attributes["src"].Value.StartsWith("file://")) {
-				return;
-			}
+			try {
+				if (image.Attributes["src"].Value.StartsWith("file://")) {
+					return;
+				}
 
-			HtmlAttributeCollection attributes = image.Attributes;
-			foreach (HtmlAttribute attr in attributes.ToList()) {
-				if (attr.Name == "src" || attr.Name == "alt" || attr.Name == "width") {
-					continue;
+				HtmlAttributeCollection attributes = image.Attributes;
+				foreach (HtmlAttribute attr in attributes.ToList()) {
+					if (attr.Name == "src" || attr.Name == "alt" || attr.Name == "width") {
+						continue;
+					}
+					if (attr.Name == "data-src") {
+						image.Attributes["src"].Value = attr.Value;
+					}
+					image.Attributes[attr.Name].Remove();
 				}
-				if (attr.Name == "data-src") {
-					image.Attributes["src"].Value = attr.Value;
-				}
-				image.Attributes[attr.Name].Remove();
-			}
 
-			string imageName = GetImageName(image.Attributes["src"].Value);
-			if (!imageName.EndsWith(".png")) {
-				var files = Directory.GetFiles(folderPath, Path.GetFileNameWithoutExtension(imageName) + ".png");
-				if (files.Length > 0) {
-					imageName = Path.GetFileNameWithoutExtension(imageName) + ".png";
+				string imageName = GetImageName(image.Attributes["src"].Value);
+
+				var files = Directory.GetFiles(folderPath, Path.GetFileNameWithoutExtension(imageName) + ".*");
+				if (files == null || files.Length == 0) {
+					return;
 				}
-			}
-			image.Attributes["src"].Value = "file:///" + folderPath + imageName;
+				if (!imageName.EndsWith(".png")) {
+					var pngFiles = Directory.GetFiles(folderPath, Path.GetFileNameWithoutExtension(imageName) + ".png");
+					if (pngFiles.Length > 0) {
+						imageName = Path.GetFileNameWithoutExtension(imageName) + ".png";
+					}
+				}
+				image.Attributes["src"].Value = "file:///" + folderPath + imageName;
+			} catch(Exception e) {
+				Error(e.ToString());
+				throw (e);
+      }
 		}
 
 		public string GetImageName(string imagePath) {
