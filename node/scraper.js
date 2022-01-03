@@ -10,6 +10,8 @@ const validTimeValues = {
 	day: "day"
 }
 
+// catch up = samurai, quiver, Orgasms, boobbounce, BigBoobsGonewild, BustyNaturals, GWBusty, BustyPetite, gonewild, TittyDrop
+
 const imaginarySubs = {
 	chill: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Chill', 
@@ -17,7 +19,7 @@ const imaginarySubs = {
 	},
 	characters: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Characters', 
-		subreddits: "ImaginaryCharacters, ImaginaryArchers, ImaginaryClerics, ImaginaryAssassins, ImaginaryKnights, ImaginaryNobles, ImaginaryScholars, ImaginarySoldiers, ImaginaryWarriors, ImaginaryWizards, ImaginaryDwarves, ImaginaryElves, ImaginaryHumans, ImaginaryOrcs, armoredwomen, ImaginAsian, ReasonableFantasy, imaginarybards, ImaginaryArtists, ImaginaryNatives, ImaginaryVikings, ImaginaryWitches, ImaginaryNinjas, ImaginaryGnomes, ImaginaryMerchants"
+		subreddits: "ImaginaryCharacters, ImaginaryArchers, ImaginaryClerics, ImaginaryAssassins, ImaginaryKnights, ImaginaryNobles, ImaginaryScholars, ImaginarySoldiers, ImaginaryWarriors, ImaginaryWizards, ImaginaryDwarves, ImaginaryElves, ImaginaryHumans, ImaginaryOrcs, armoredwomen, ImaginAsian, ReasonableFantasy, imaginarybards, ImaginaryArtists, ImaginaryNatives, ImaginaryVikings, ImaginaryWitches, ImaginaryNinjas, ImaginaryGnomes, ImaginaryMerchants, ImaginarySamurai"
 	},
 	items: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Items', 
@@ -67,20 +69,20 @@ const imaginarySubs = {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi', 
 		subreddits: "ImaginaryCyberpunk, ImaginaryFutureWar, ImaginaryFuturism, ImaginaryMechs, ImaginaryRobotics, futureporn"
 	},
-	characters: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi\\Characters', 
+	scifiCharacters: {
+		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Characters', 
 		subreddits: "ImaginaryCybernetics, ImaginaryAstronauts"
 	},
 	aliens: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi\\Aliens', 
+		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Aliens', 
 		subreddits: "ImaginaryAliens"
 	},
-	places: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi\\Places', 
+	scifiPlaces: {
+		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Places', 
 		subreddits: "ImaginaryStarscapes, SuperStructures"
 	},
 	starships: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi\\Starships', 
+		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Starships', 
 		subreddits: "ImaginaryStarships, StarshipPorn"
 	},
 	isometric: {
@@ -134,7 +136,7 @@ const dungeonSubs = {
 const nhDownloadFolder = "E:/Pictures/Comics/_SPECIAL_/zzzDrawings";
 const nhUsedFolder = "E:/Pictures/Comics/_SPECIAL_/Drawings";
 
-function redditDownload(subreddits, folderPath, time, limit, additionalArguments) {
+function redditDownload(folderPath, subreddits, time, limit, additionalArguments) {
 	const usedTime = time && validTimeValues[time] ? validTimeValues[time] : validTimeValues.all;
 	utils.logYellow(`Downloading files from top of ${usedTime}`);
 	const usedLimit = limit ? limit : 1000;
@@ -143,7 +145,7 @@ function redditDownload(subreddits, folderPath, time, limit, additionalArguments
 	const logPath = folderPath.split("\\");
 	logPath.pop();
 	logPath.push("bdfr_logs");
-	utils.execShell(`py -m bdfr download ${folderPath} --subreddit "${subreddits}" --no-dupes --search-existing --folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" --skip-domain "instagram.fbna1-2.fna.fbcdn.net" --skip-domain "https://instagram.fbna1-1.fna.fbcdn.net" --skip-domain "youtube.com" --skip-domain "youtu.be" --skip-domain "www.pornhub.com"	--log "${logPath.join("\\")}" --max-wait-time 30 --time "${usedTime}" --limit "${usedLimit}" --skip "txt" ${additional}`)
+	utils.execShell(`py -m bdfr download "${folderPath}" --subreddit "${subreddits}" --sort top --no-dupes --search-existing --folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" --skip-domain "instagram.fbna1-2.fna.fbcdn.net" --skip-domain "https://instagram.fbna1-1.fna.fbcdn.net" --skip-domain "youtube.com" --skip-domain "youtu.be" --skip-domain "www.pornhub.com"	--log "${logPath.join("\\")}" --max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" ${additional}`)
 }
 
 function imaginaryDownload() {
@@ -157,7 +159,7 @@ function imaginaryDownload() {
 		utils.logBlue(`Downloading ${target}`)
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 200)
+		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 1000)
 	}
 }
 
@@ -166,7 +168,7 @@ function bootyDownload() {
 
 	for (let i = 0; i < targets.length; i++) {
 		const target = targets[i];
-		const details = imaginarySubs[target];
+		const details = bootySubs[target];
 		
 		utils.logLine();
 		utils.logBlue(`Downloading ${target}`)
@@ -181,7 +183,7 @@ function dungeonDownload() {
 
 	for (let i = 0; i < targets.length; i++) {
 		const target = targets[i];
-		const details = imaginarySubs[target];
+		const details = dungeonSubs[target];
 		
 		utils.logLine();
 		utils.logBlue(`Downloading ${target}`)
