@@ -1,6 +1,7 @@
 const utils = require ("./utils.js");
 const path = require("path");
 const fs = require("fs");
+const sharp = require("sharp");
 
 const validTimeValues = {
 	all: "all",
@@ -9,8 +10,6 @@ const validTimeValues = {
 	week: "week",
 	day: "day"
 }
-
-// catch up = samurai, quiver, Orgasms, boobbounce, BigBoobsGonewild, BustyNaturals, GWBusty, BustyPetite, gonewild, TittyDrop
 
 const imaginarySubs = {
 	chill: {
@@ -31,7 +30,8 @@ const imaginarySubs = {
 	},
 	pets: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Pets', 
-		subreddits: "ImaginaryAww, imaginarypets, AdorableDragons"
+		subreddits: "ImaginaryAww, imaginarypets, AdorableDragons",
+		limit: 50
 	},
 	vehicles: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Vehicles', 
@@ -48,6 +48,11 @@ const imaginarySubs = {
 	monsters: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Monsters', 
 		subreddits: "ImaginaryMonsters, ImaginaryDragons, ImaginaryElementals, ImaginaryHorrors, ImaginaryHybrids, ImaginaryLeviathans, ImaginaryUndead, ImaginaryWorldEaters, ImaginaryBeasts, ImaginaryBehemoths, BadAssDragons, ImaginaryTrolls, ImaginaryDinosaurs, ImaginarySpirits"
+	},
+	monsters2: {
+		folderPath: 'E:\\Pictures\\Imaginary Network\\Monsters', 
+		subreddits: "ImaginaryDragons",
+		limit: 50
 	},
 	places: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Places', 
@@ -101,15 +106,15 @@ const imaginarySubs = {
 
 const bootySubs = {
 	east: {
-		folderPath: 'E:\\Pictures\\Comics\\_SPECIAL_\\East',
-		subreddits: "bustyasians, juicyasians, asianandlovingit, asian_gifs, AsiansGoneWild, AsianNSFW, AikaYumeno, AsianPornIn1Minute, hugeboobsjav, NSFW_Japan, Ai_Shinozaki, AsianHotties, AsianCuties, TeramotoRio, FansOfRaMu, AsiansGoneWild, AsianPorn, JapanesePorn2, ShionUtsunomiya, ai_uehara, Aimi_Yoshikawa, JuliaJAV, junamaki, KahoShibuya, KureaHasumi, RioHamasaki, SakiYanase, SakuraKirishima, shioritsukada, YukiJin, RenaMomozono, YuShinoda, HanaHarunaJAV"
+		folderPath: 'R:\\Game resources\\Battlebacks\\_SPECIAL_\\East',
+		subreddits: "bustyasians, juicyasians, asianandlovingit, asian_gifs, AsianNSFW, AikaYumeno, AsianPornIn1Minute, hugeboobsjav, NSFW_Japan, Ai_Shinozaki, AsianHotties, AsianCuties, TeramotoRio, FansOfRaMu, AsiansGoneWild, AsianPorn, JapanesePorn2, ShionUtsunomiya, ai_uehara, Aimi_Yoshikawa, JuliaJAV, junamaki, KahoShibuya, KureaHasumi, RioHamasaki, SakiYanase, SakuraKirishima, shioritsukada, YukiJin, RenaMomozono, YuShinoda, HanaHarunaJAV"
 	},
 	end: {
-		folderPath: 'E:\\Pictures\\Comics\\_SPECIAL_\\End',
+		folderPath: 'R:\\Game resources\\Battlebacks\\_SPECIAL_\\End',
 		subreddits: "whenitgoesin, O_Faces, pronebone, quiver, Orgasms"
 	},
 	reveal: {
-		folderPath: 'E:\\Pictures\\Comics\\_SPECIAL_\\Reveal',
+		folderPath: 'R:\\Game resources\\Battlebacks\\_SPECIAL_\\Reveal',
 		subreddits: "BiggerThanYouThought, OnOff, cosplayonoff, onoffcollages, Upskirt, Underskirts, cleavage, EpicCleavage, boobbounce, BigBoobsGonewild, BustyNaturals, GWBusty, BustyPetite, gonewild, TittyDrop"
 	}
 }
@@ -133,19 +138,29 @@ const dungeonSubs = {
 	}
 }
 
-const nhDownloadFolder = "E:/Pictures/Comics/_SPECIAL_/zzzDrawings";
-const nhUsedFolder = "E:/Pictures/Comics/_SPECIAL_/Drawings";
+const nhDownloadFolder = "R:/Game resources/Battlebacks/_SPECIAL_/zzzDrawings";
+const nhUsedFolder = "R:/Game resources/Battlebacks/_SPECIAL_/Drawings";
 
-function redditDownload(folderPath, subreddits, time, limit, additionalArguments) {
+const forbiddenDomains = ["instagram.fbna1-2.fna.fbcdn.net", "instagram.fbna1-1.fna.fbcdn.net", "youtube.com", "youtu.be", "www.pornhub.com", "jp.spankbang.com"];
+const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", "VedaDragon", "BeardyBennett", "CharmanterPanter", "Ikiera",
+												"RedPersik", "TheGamedawg", "Meraugis", "NeoTheProtogen", "SnickerToodles", "UnpaidPigeon", "kazmatazzzz", "Jaybaybay2838", 
+												"Lovable-Peril", "MagmaHotsguy", "Marmasghetti", "jaco147", "geergutz", "ClayEnchanter", "castass", "ZENRAMANIAC", "KronalgalVas",
+												"B0B_22", "Taguel16", "Cab0san", "RowzeiChan", "Hollz23", "TripleA2006", "championsgamer1", "Reykurinn", "AgentB90",
+												"comics0026", "AimlessGrace", "axes_and_asses", "ImperatorZor", "HellsJuggernaut", "angelberries", "FoolishMacaroni",
+												"nbolen13", "Space_Fox586", "EwokTheGreatPrp", "EmeraldScales", "ClassicFrancois18", "pweavd", "smolb0i"];
+
+function redditDownload(folderPath, subreddits, time, limit, skipExisting, additionalArguments) {
 	const usedTime = time && validTimeValues[time] ? validTimeValues[time] : validTimeValues.all;
 	utils.logYellow(`Downloading files from top of ${usedTime}`);
 	const usedLimit = limit ? limit : 1000;
 	const additional = additionalArguments ? ` ${additionalArguments}` : "";
+	const skippedDomains = forbiddenDomains.map(domain => `--skip-domain "${domain}"`).join(" ");
+	const skipExistingParam = skipExisting ? "--skip-existing" : "";
 
 	const logPath = folderPath.split("\\");
 	logPath.pop();
 	logPath.push("bdfr_logs");
-	utils.execShell(`py -m bdfr download "${folderPath}" --subreddit "${subreddits}" --sort top --no-dupes --search-existing --folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" --skip-domain "instagram.fbna1-2.fna.fbcdn.net" --skip-domain "https://instagram.fbna1-1.fna.fbcdn.net" --skip-domain "youtube.com" --skip-domain "youtu.be" --skip-domain "www.pornhub.com"	--log "${logPath.join("\\")}" --max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" ${additional}`)
+	utils.execShell(`py -m bdfr download "${folderPath}" --subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} --folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" ${skippedDomains}	--log "${logPath.join("\\")}" --max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" ${additional}`)
 }
 
 function imaginaryDownload() {
@@ -159,7 +174,7 @@ function imaginaryDownload() {
 		utils.logBlue(`Downloading ${target}`)
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 1000)
+		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, details.limit ? details.limit : 200, true)
 	}
 }
 
@@ -174,7 +189,7 @@ function bootyDownload() {
 		utils.logBlue(`Downloading ${target}`)
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 1000);
+		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 1000, false);
 	}
 }
 
@@ -189,7 +204,7 @@ function dungeonDownload() {
 		utils.logBlue(`Downloading ${target}`)
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 50);
+		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 50, true);
 	}
 }
 
@@ -286,6 +301,77 @@ function sortArt() {
 	});
 }
 
+async function cleanUnwanted() {
+	let found = 0;
+	let  folders = Object.keys(imaginarySubs).map(key => imaginarySubs[key].folderPath);
+	folders = folders.concat(Object.keys(bootySubs).map(key => bootySubs[key].folderPath));
+	folders = folders.concat(Object.keys(dungeonSubs).map(key => dungeonSubs[key].folderPath));
+	folders.push("E:\\Pictures\\zzzWallpapers temp");
+	folders.push("E:\\Pictures\\zzzWallpapers temp-toscale");
+	folders.push("E:\\Pictures\\zzzWallpapers temp-upscaled");
+	folders.push("E:\\Pictures\\zzzWallpapers to downscale");
+	folders.push("E:\\Pictures\\zzzWallpapers mobile temp");
+	folders.push("E:\\Pictures\\zzzWallpapers mobile temp-toscale");
+	folders.push("E:\\Pictures\\zzzWallpapers mobile temp-upscaled");
+	folders.push("E:\\Pictures\\zzzWallpapers mobile to downscale");
+	
+	folders.forEach(async (folderRaw) => {
+		const folder = folderRaw.replace(/\\/g, "/");
+		let folderFound = 0;
+		if(!fs.existsSync(folder)) {
+			utils.logYellow(`${folder} has not been created yet`);
+			return;
+		}
+		const files = fs.readdirSync(folder);
+		files.forEach((file) => {
+			let shouldDelete = false;
+			if(folder.indexOf("mobile") === -1 
+				&& (
+					file.toLowerCase().startsWith("animephonewallpapers") || 
+					file.toLowerCase().startsWith("mobilewallpaper") || 
+					file.toLowerCase().startsWith("verticalwallpapers")
+				)) {
+					shouldDelete = true;
+				}
+			else if(file.split("_").length > 1) {
+				const begin = file.split("_")[0];
+				const shortName = file.replace(begin + "_", "");
+				shouldDelete = !!forbiddenUsers.find((user) => {return shortName.startsWith(user)});
+			}
+
+			if(!shouldDelete) {
+				return;
+			}
+			utils.deleteFolder(path.join(folder, file));
+			found++;
+			folderFound++;
+		});
+		if(folderFound > 0) {
+			utils.logGreen(`Deleted ${folderFound} from ${path.basename(folder)}`);
+		}
+	});
+	utils.logBlue(`Deleted ${found} not so pretty pictures`);
+}
+
+// function cleanYoutubeThumbnails() {
+// 	const youtubeFolder = "K:/Youtube";
+// 	const folders = fs.readdirSync(youtubeFolder);
+// 	const annoyingExtension = " - Videos";
+// 	folders.forEach((folder) => {
+// 		const files = fs.readdirSync(path.join(youtubeFolder, folder));
+// 		if(files.map(utils.getFileNameWithoutExtension).indexOf(folder) > -1 ) {
+// 			return;
+// 		}
+
+// 		files.forEach((file) => {
+// 			const filename = utils.getFileNameWithoutExtension(file);
+// 			if(filename === folder + annoyingExtension) {
+// 				sharp(path.join(youtubeFolder, folder, file)).toFormat("png").toFile(path.join(youtubeFolder, folder, "show.png"));
+// 			}
+// 		})
+// 	})
+// }
+
 exports.validTimeValues = validTimeValues;
 exports.redditDownload = redditDownload;
 exports.redditCatchup = redditCatchup;
@@ -300,3 +386,8 @@ exports.dungeonDownload = dungeonDownload;
 
 exports.generateArtPreviews = generateArtPreviews;
 exports.sortArt = sortArt;
+
+exports.forbiddenUsers = forbiddenUsers;
+exports.cleanUnwanted = cleanUnwanted;
+
+// exports.cleanYoutubeThumbnails = cleanYoutubeThumbnails;

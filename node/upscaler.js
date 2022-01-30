@@ -19,7 +19,7 @@ const models = {
 function upscaleFolderToOutput(inputPath, outputPath, modelName, useTransparency) {
 	const usedModel = modelName ? modelName.endsWith(".pth") ? modelName : `${modelName}.pth` : models.universalSharp;
 	const transparentParameters = useTransparency ? " --ternary-alpha --alpha-mode alpha_separately" : "";
-	utils.execShell(`python E:\\Downloads\\esrgan\\upscale.py "E:\\Downloads\\esrgan\\models\\${usedModel}" --input "${inputPath}" --output "${outputPath}" --skip-existing --verbose ${transparentParameters}`);
+	utils.execShell(`python E:\\Downloads\\esrgan\\upscale.py "E:\\Downloads\\esrgan\\models\\${usedModel}" --input "${inputPath}" --output "${outputPath}" --skip-existing --verbose ${transparentParameters} -fp16`);
 }
 
 async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeight) {
@@ -34,16 +34,20 @@ async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeig
 	utils.createFolder(upscaledFolderName);
 	utils.logLine();
 	const images = fs.readdirSync(inputPath);
-	for (let i = 0; i < images.length; i++) {
-		const imageName = images[i];
-		console.log(`${i+1} out of ${images.length}: ${imageName}`);
+	const toUpscaleImages = fs.readdirSync(toUpscalename);
+	const upscaledImages = fs.readdirSync(upscaledFolderName);
+	await Promise.all(images.map(async (imageName, index) => {
 		if(utils.isFolder(imageName)) {
-			continue;
-		} 
+			return;
+		}
+		if(toUpscaleImages.indexOf(imageName) > -1 || upscaledImages.indexOf(imageName) > -1) {
+			return;
+		}
 		await sharp(path.join(inputPath, imageName))
 		  .metadata()
 		  .then(({ width, height }) => {
-			const shouldUpscale = minHeight ? height < minHeight : width < desiredWidth;
+				console.log(`${index+1} out of ${images.length}: ${imageName}`);
+				const shouldUpscale = minHeight ? height < minHeight : width < desiredWidth;
 		  	if(!shouldUpscale) {
 		  		console.log(`=> moving to conversion folder`);
 		  		fs.writeFileSync(path.join(upscaledFolderName, imageName), fs.readFileSync(path.join(inputPath, imageName)));
@@ -54,12 +58,12 @@ async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeig
 		  	}
 	  	}
 	  );		
-	}
+	}))
 
 	utils.logLine();
 	upscaleFolderToOutput(toUpscalename, upscaledFolderName, modelName);
 
-	if(!output) {
+	if(!outputPath) {
 		utils.logLine();
 		utils.deleteFolder(inputPath);
 		utils.createFolder(inputPath);
@@ -76,8 +80,8 @@ async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeig
 	}
 
 	utils.logLine();
-	utils.deleteFolder(toUpscalename);
-	utils.deleteFolder(upscaledFolderName);
+	// utils.deleteFolder(toUpscalename);
+	// utils.deleteFolder(upscaledFolderName);
 
 	utils.logLine();
 	utils.logGreen(`Finished upscaling ${inputPath}`);
@@ -88,23 +92,21 @@ async function convertFolderToJpg(inputFolder, outputFolder) {
 	const images = fs.readdirSync(inputFolder);
 	const existingFiles = utils.getListOfFilesWithoutExtension(outputFolder);
 
-	for (let i = 0; i < images.length; i++) {
-		const image = images[i];
+	await Promise.all(images.map(async (image, index) => {
 		const imageName = utils.getFileNameWithoutExtension(image);
-		const index = `${i+1}/${images.length}`
-		console.log(`Converting image ${utils.yellowString(index)}: ${image}`);
+		const indexText = `${index+1}/${images.length}`;
 		if(utils.isFolder(image)) {
-			utils.logYellow(`=> is a folder, skipping`);
-			continue;
+			utils.logYellow(`=> ${indexText} is a folder, skipping`);
+			return;
 		}
 		if(existingFiles.indexOf(imageName) > -1) {
-			utils.logBlue(`=> already exists, skipping`);
-			continue;
+			utils.logBlue(`=> ${indexText} already exists, skipping`);
+			return;
 		}
 		if(!(image.endsWith(".png") || image.endsWith(".webp") || image.endsWith(".bmp"))) {
-			utils.logBlue(`=> cannot be converted, moving as is`);
+			utils.logBlue(`=> ${indexText} cannot be converted, moving as is`);
 			fs.writeFileSync(path.join(outputFolder, image), fs.readFileSync(path.join(inputFolder, image)));
-			continue;
+			return;
 		}
 
 		await sharp(path.join(inputFolder, image))
@@ -113,14 +115,57 @@ async function convertFolderToJpg(inputFolder, outputFolder) {
 	      force: true, // <----- add this parameter
 	    })
 	    .toFile(path.join(outputFolder, imageName+".jpg"))
-    utils.logGreen("=> converted to jpg")
-  }
+			.then(() => {
+				
+				console.log(`Converting image ${utils.yellowString(indexText)}: ${image}`);
+				utils.logGreen("=> converted to jpg");
+			})
+  }))
 
   return;
 }
 
+// async function downscaleFolder(folderPath, desiredWidth, desiredHeight) {
+// 	const files = fs.readdirSync(folderPath);
+// 	const widthFolder = folderPath.replace(path.dirname(folderPath), path.dirname + "-width");
+// 	const heightFolder = folderPath.replace(path.dirname(folderPath), path.dirname + "-height");
+
+// 	for (let i = 0; i < files.length; i++) {
+// 		const file =  files[i];
+// 		const filePath = path.join(folder, file);
+		
+// 		await sharp(filePath)
+// 			.metadata()
+// 			.then(({ width, height }) => {
+// 				if((height/width) === (desiredHeight/desiredWidth)) {
+// 					if(height === desiredHeight) {
+// 						return;
+// 					}
+// 					console.log(file);
+// 					utils.logGreen("=> moving to height folder");
+// 					fs.renameSync(filePath, path.join(heightFolder, file));
+// 				} else {
+// 					if(width === desiredWidth) {
+// 						return;
+// 					}
+// 					console.log(file);
+// 					utils.logGreen("=> moving to width folder");
+// 					fs.renameSync(filePath, path.join(widthFolder, file));
+// 				}
+// 			})
+// 	}
+
+// 	const widthFiles = fs.readdirSync(widthFolder);
+// 	const heightFiles = fs.readdirSync(heightFolder);
+
+// 	for (let j = 0; j < widthFiles.length; j++) {
+// 		const file = widthFiles[j];
+// 		sharp(path.join(widthFolder, file)).resize(desiredWidth, desiredHeight);
+// 	}
+// }
+
 async function upscalePSX(gameName) {
-	const folderLocation = "E:/Games/Emulation/PSX"
+	const folderLocation = "R:/Emulation/PSX"
 	const dumpFolder = `${folderLocation}/${gameName}-texture-dump`;
 	const targetFolder = `${folderLocation}/${gameName}-texture-replacements`;
 	const tempFolder = `${folderLocation}/${gameName}-texture-temp`;
