@@ -9,34 +9,46 @@ const wallpaperFolder = "E:/Pictures/Wallpapers";
 const mobileFolder = "E:/Pictures/Wallpapers mobile";
 const imaginaryFolder = "E:/Pictures/Imaginary Network";
 
-const wallpaperTemp = "E:/Pictures/Wallpapers temp";
-const mobileTemp = "E:/Pictures/Wallpapers mobile temp";
+const wallpaperTemp = "E:/Pictures/zzzWallpapers temp";
+const mobileTemp = "E:/Pictures/zzzWallpapers mobile temp";
+
+const toScaleDesktop = "E:/Pictures/zzzWallpapers temp-toscale";
+const toScaleMobile = "E:/Pictures/zzzWallpapers mobile temp-toscale";
+
+const toConvertDesktop = "E:/Pictures/zzzWallpapers temp-upscaled";
+const toConvertMobile = "E:/Pictures/zzzWallpapers mobile temp-upscaled";
+
+const toDownscaleDesktop = "E:/Pictures/zzzWallpapers to downscale";
+const toDownscaleMobile = "E:/Pictures/zzzWallpapers mobile to downscale";
 
 const outputFinal = "E:/Pictures/Wallpapers final";
 const outputMobile = "E:/Pictures/Wallpapers mobile final";
 
-const toScaleDesktop = "E:/Pictures/Wallpapers temp-toscale";
-const toConvertDesktop = "E:/Pictures/Wallpapers temp-upscaled";
-const toScaleMobile = "E:/Pictures/Wallpapers mobile temp-toscale";
-const toConvertMobile = "E:/Pictures/Wallpapers mobile temp-upscaled";
-
 cleanToScale();
 
 async function cleanToScale() {
-	const files = fs.readdirSync(toScaleMobile);
-	const finalFiles = utils.getListOfFilesWithoutExtension(outputMobile);
-	let deleted = 0;
+	const filesToScale = fs.readdirSync(toScaleMobile);
+	const filesTemp = fs.readdirSync(mobileTemp);
+	const filesScaled = utils.getListOfFilesWithoutExtension(toConvertMobile);
+	let deletedToScale = 0;
+	let deletedTemp = 0;
 
-	files.forEach(file => {
-		if(finalFiles.indexOf(utils.getFileNameWithoutExtension(file)) > -1) {
+	filesTemp.forEach(file => {
+		if(filesScaled.indexOf(utils.getFileNameWithoutExtension(file)) > -1) {
+			utils.deleteFolder(path.join(mobileTemp, file));
+			deletedTemp += 1;
+		}
+	});
+
+	filesToScale.forEach(file => {
+		if(filesScaled.indexOf(utils.getFileNameWithoutExtension(file)) > -1) {
 			utils.deleteFolder(path.join(toScaleMobile, file));
-			utils.deleteFolder(path.join(toConvertMobile, utils.getFileNameWithoutExtension(file)+".png"));
-			deleted += 1;
+			deletedToScale += 1;
 		}
 	});
 
 	utils.logLine();
-	console.log(`Deleted ${utils.redString(deleted)} duplicate files`);
+	console.log(`Deleted ${utils.redString(deletedTemp)} duplicate files from temp folder`);
+	console.log(`Deleted ${utils.redString(deletedToScale)} duplicate files from to-scale folder`);
 	utils.logLine();
-
 }
