@@ -141,7 +141,7 @@ const dungeonSubs = {
 const nhDownloadFolder = "R:/Game resources/Battlebacks/_SPECIAL_/zzzDrawings";
 const nhUsedFolder = "R:/Game resources/Battlebacks/_SPECIAL_/Drawings";
 
-const forbiddenDomains = ["instagram.fbna1-2.fna.fbcdn.net", "instagram.fbna1-1.fna.fbcdn.net", "youtube.com", "youtu.be", "www.pornhub.com", "jp.spankbang.com"];
+const forbiddenDomains = ["instagram.fbna1-2.fna.fbcdn.net", "instagram.fbna1-1.fna.fbcdn.net", "youtube.com", "youtu.be", "jp.spankbang.com"];
 const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", "VedaDragon", "BeardyBennett", "CharmanterPanter", "Ikiera",
 												"RedPersik", "TheGamedawg", "Meraugis", "NeoTheProtogen", "SnickerToodles", "UnpaidPigeon", "kazmatazzzz", "Jaybaybay2838", 
 												"Lovable-Peril", "MagmaHotsguy", "Marmasghetti", "jaco147", "geergutz", "ClayEnchanter", "castass", "ZENRAMANIAC", "KronalgalVas",
@@ -155,12 +155,19 @@ function redditDownload(folderPath, subreddits, time, limit, skipExisting, addit
 	const usedLimit = limit ? limit : 1000;
 	const additional = additionalArguments ? ` ${additionalArguments}` : "";
 	const skippedDomains = forbiddenDomains.map(domain => `--skip-domain "${domain}"`).join(" ");
+	const skippedUsers = forbiddenUsers.map(user => `--ignore-user "${user}"`).join(" ");
 	const skipExistingParam = skipExisting ? "--skip-existing" : "";
 
 	const logPath = folderPath.split("\\");
 	logPath.pop();
 	logPath.push("bdfr_logs");
-	utils.execShell(`py -m bdfr download "${folderPath}" --subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} --folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" ${skippedDomains}	--log "${logPath.join("\\")}" --max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" ${additional}`)
+	utils.execShell(`py -m bdfr download "${folderPath}" 
+									--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} 
+									--folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" 
+									${skippedDomains}	${skippedUsers}
+									--log "${logPath.join("\\")}" 
+									--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" 
+									${additional} --verbose`)
 }
 
 function imaginaryDownload() {
