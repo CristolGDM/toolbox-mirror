@@ -1,0 +1,8 @@
+./bulk-downloader-for-reddit
+/bulk-downloader-for-reddit
+bdfr_logs
+bdfr_logs*
+bdfr_logs.*
+node_modules
+node-tools/compiled
+other-subs*
