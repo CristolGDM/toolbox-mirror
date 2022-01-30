@@ -48,6 +48,15 @@ namespace DescriptionCleaning {
 						PlayniteApi.Dialogs.ActivateGlobalProgress(CleanAll, options) ;
 					}
 				}
+				//new MainMenuItem {
+				//	MenuSection = "@Cleanup",
+				//	Description = "Update paths",
+				//	Action = (mainMenuItem) =>
+				//	{
+				//		GlobalProgressOptions options = new GlobalProgressOptions("Updating paths", true);
+				//		PlayniteApi.Dialogs.ActivateGlobalProgress(UpdatePaths, options) ;
+				//	}
+				//}
 			};
 
 			return mainMenuItems;
@@ -73,6 +82,24 @@ namespace DescriptionCleaning {
 		public void PopupMessage(string message) {
 			PlayniteApi.Dialogs.ShowMessage(message);
 		}
+
+		//public void UpdatePaths(GlobalProgressActionArgs progress) {
+		//	foreach (Game game in PlayniteApi.Database.Games) {
+		//		LogMessage(game.Name);
+		//		if(game.Roms == null) {
+		//			continue;
+  //      } 
+		//		foreach (GameRom rom in game.Roms) {
+		//			LogMessage($"install folder is {game.InstallDirectory}");
+		//			LogMessage($"rom path is {rom.Path}");
+		//			rom.Path = rom.Path.Replace("E:\\Games\\Emulation", "R:\\Emulation");
+		//			rom.Path = rom.Path.Replace(game.InstallDirectory, "{InstallDir}\\");
+		//			rom.Path = rom.Path.Replace("\\\\", "\\");
+		//			LogMessage($"new rom path is {rom.Path}");
+		//		}
+  //      PlayniteApi.Database.Games.Update(game);
+  //    }
+  //  }
 
 		public void DownloadAll(GlobalProgressActionArgs progress) {
 			LogMessage("Starting download");
@@ -310,8 +337,7 @@ namespace DescriptionCleaning {
 							}
 						}
 					});
-					LogMessage("After links");
-
+					
 					string result = LastCleanHtml(body.InnerHtml);
 
 					if (result.Length == 0 || removeWhitespaceRegex.Replace(result, "").Length == 0) {
@@ -342,6 +368,7 @@ namespace DescriptionCleaning {
 		private void CleanImage(HtmlNode image, string folderPath) {
 			try {
 				if (image.Attributes["src"].Value.StartsWith("file://")) {
+					image.Attributes["src"].Value = image.Attributes["src"].Value.Replace("file:///R:/Playnite", "file:///V:/Playnite");
 					return;
 				}
 
@@ -356,7 +383,9 @@ namespace DescriptionCleaning {
 					image.Attributes[attr.Name].Remove();
 				}
 
-				string imageName = GetImageName(image.Attributes["src"].Value);
+				string imageName = image.Attributes["src"].Value;
+				imageName = imageName.Split(new string[] { "/revision/" }, StringSplitOptions.None)[0];
+				imageName = GetImageName(imageName);
 
 				var files = Directory.GetFiles(folderPath, Path.GetFileNameWithoutExtension(imageName) + ".*");
 				if (files == null || files.Length == 0) {
@@ -446,6 +475,9 @@ namespace DescriptionCleaning {
 			htmlContent = htmlContent.Replace("</img>", "</img>\n\n");
 			htmlContent = htmlContent.Replace("</img>\n\n</figure>", "</img></figure>");
 
+			htmlContent = htmlContent.Replace("\n\n<img", "<img");
+			htmlContent = htmlContent.Replace("<img", "\n\n<img");
+
 			htmlContent = htmlContent.Replace("</p>\n\n", "</p>");
 			htmlContent = htmlContent.Replace("</p>", "</p>\n\n");
 
@@ -466,6 +498,17 @@ namespace DescriptionCleaning {
 
 			htmlContent = htmlContent.Replace("href=\"/", "href=\"https://www.giantbomb.com/");
 
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
+			htmlContent.Replace("\n\n\n", "\n\n");
 			return htmlContent;
 		}
 
