@@ -156,17 +156,17 @@ function redditDownload(folderPath, subreddits, time, limit, skipExisting, addit
 	const additional = additionalArguments ? ` ${additionalArguments}` : "";
 	const skippedDomains = forbiddenDomains.map(domain => `--skip-domain "${domain}"`).join(" ");
 	const skippedUsers = forbiddenUsers.map(user => `--ignore-user "${user}"`).join(" ");
-	const skipExistingParam = skipExisting ? "--skip-existing" : "";
+	const skipExistingParam = skipExisting ? "--search-existing" : "";
 
 	const logPath = folderPath.split("\\");
 	logPath.pop();
 	logPath.push("bdfr_logs");
-	utils.execShell(`py -m bdfr download "${folderPath}" 
-									--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} 
-									--folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" 
-									${skippedDomains}	${skippedUsers}
-									--log "${logPath.join("\\")}" 
-									--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" 
+	utils.execShell(`py -m bdfr download "${folderPath}" \
+									--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} \
+									--folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" \
+									${skippedDomains}	${skippedUsers} \
+									--log "${logPath.join("\\")}" \
+									--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" \
 									${additional} --verbose`)
 }
 
