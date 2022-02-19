@@ -223,11 +223,9 @@ function redditCatchup(folderPath, subredditName) {
 }
 
 function generateArtPreviews() {
-	const foldersLocation = "E:/Pictures/Comics/_SPECIAL_/Drawings";
-
-	const folders = fs.readdirSync(foldersLocation);
+	const folders = fs.readdirSync(nhUsedFolder);
 	folders.forEach((folder) => {
-		const files = fs.readdirSync(`${foldersLocation}/${folder}`);
+		const files = fs.readdirSync(`${nhUsedFolder}/${folder}`);
 	
 		if(files.findIndex(file => file.startsWith("folder.jpg")) > -1) {
 			console.log("=> folder pic exists already");
@@ -239,12 +237,12 @@ function generateArtPreviews() {
 		console.log(utils.separator(18));
 	
 		const originalPictureName = files.find(file => file.startsWith("001"));
-		const originalPicture = fs.readFileSync(`${foldersLocation}/${folder}/${originalPictureName}`)
+		const originalPicture = fs.readFileSync(`${nhUsedFolder}/${folder}/${originalPictureName}`)
 		if(!originalPicture) {
 			console.error("no picture");
 			return;
 		}
-		fs.writeFileSync(`${foldersLocation}/${folder}/folder.jpg`, originalPicture)
+		fs.writeFileSync(`${nhUsedFolder}/${folder}/folder.jpg`, originalPicture)
 		console.log("=> done");
 	});
 }
