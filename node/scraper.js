@@ -359,6 +359,35 @@ async function cleanUnwanted() {
 	utils.logBlue(`Deleted ${found} not so pretty pictures`);
 }
 
+function cleanImaginary() {
+	let  folders = Object.keys(imaginarySubs).map(key => imaginarySubs[key].folderPath);
+	folders = folders.concat(Object.keys(dungeonSubs).map(key => dungeonSubs[key].folderPath));
+
+	for (let index = 0; index < folders.length; index++) {
+		const folder = folders[index].replace(/\\/g, "/");
+		if(!fs.existsSync(folder)) {
+			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
+			continue;
+		}
+		utils.deleteDuplicates(folder);
+		console.log(`Finished cleaning ${index+1}/${folders.length}`)
+	}
+}
+
+function cleanBooty() {
+	let  folders = Object.keys(dungeonSubs).map(key => imaginarySubs[key].folderPath);
+
+	for (let index = 0; index < folders.length; index++) {
+		const folder = folders[index].replace(/\\/g, "/");
+		if(!fs.existsSync(folder)) {
+			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
+			continue;
+		}
+		utils.deleteDuplicates(folder);
+		console.log(`Finished cleaning ${index+1}/${folders.length}`)
+	}
+}
+
 // function cleanYoutubeThumbnails() {
 // 	const youtubeFolder = "K:/Youtube";
 // 	const folders = fs.readdirSync(youtubeFolder);
@@ -395,5 +424,7 @@ exports.sortArt = sortArt;
 
 exports.forbiddenUsers = forbiddenUsers;
 exports.cleanUnwanted = cleanUnwanted;
+exports.cleanImaginary = cleanImaginary;
+exports.cleanBooty = cleanBooty;
 
 // exports.cleanYoutubeThumbnails = cleanYoutubeThumbnails;

@@ -16,6 +16,12 @@ const mobileTemp = "E:/Pictures/zzzWallpapers mobile temp";
 const outputFinal = "E:/Pictures/Wallpapers final";
 const outputMobile = "E:/Pictures/Wallpapers mobile final";
 
+const wallpaperToUpscale = "E:/Pictures/zzzWallpapers temp-toscale";
+const wallpaperToUpscaleMobile = "E:/Pictures/zzzWallpapers mobile temp-toscale";
+
+const wallpaperToConvert = "E:/Pictures/zzzWallpapers temp-upscaled";
+const wallpaperToConvertMobile = "E:/Pictures/zzzWallpapers mobile temp-upscaled";
+
 const outputDownscale = "E:/Pictures/zzzWallpapers to downscale";
 const outputMobileDownscale = "E:/Pictures/zzzWallpapers mobile to downscale";
 
@@ -351,6 +357,48 @@ async function downscaleMobile() {
 	}))
 }
 
+function cleanBeforeUpscale() {
+	const folders = [
+		wallpaperFolder,
+		mobileFolder,
+		wallpaperTemp,
+		mobileTemp,
+		wallpaperToUpscale,
+		wallpaperToUpscaleMobile,
+		wallpaperToConvert,
+		wallpaperToConvertMobile,
+		outputDownscale,
+		outputMobileDownscale
+	]
+
+	for (let index = 0; index < folders.length; index++) {
+		const folder = folders[index].replace(/\\/g, "/");
+		if(!fs.existsSync(folder)) {
+			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
+			continue;
+		}
+		utils.deleteDuplicates(folder);
+		console.log(`Finished cleaning ${index+1}/${folders.length}`)
+	}
+}
+
+function cleanAfterUpscale() {
+	const folders = [
+		outputFinal,
+		outputMobile
+	]
+
+	for (let index = 0; index < folders.length; index++) {
+		const folder = folders[index].replace(/\\/g, "/");
+		if(!fs.existsSync(folder)) {
+			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
+			continue;
+		}
+		utils.deleteDuplicates(folder);
+		console.log(`Finished cleaning ${index+1}/${folders.length}`)
+	}
+}
+
 async function downscale() {
 	utils.createFolder(outputFinal);
 	utils.createFolder(outputMobile);
@@ -370,39 +418,29 @@ async function downscale() {
 	});
 }
 
-function clean() {
-	utils.deleteFolder(wallpaperTemp);
-	utils.deleteFolder(mobileTemp);
-	utils.deleteFolder(outputDownscale);
-	utils.deleteFolder(outputMobileDownscale);
+async function convert() {
+	upscaler.convertFolderToJpg(wallpaperToConvert, outputDownscale).then(() => {
+		upscaler.convertFolderToJpg(wallpaperToConvertMobile, outputMobileDownscale)
+	})
 }
 
-async function temp() {
-	const folder = "E:/Pictures/zzzWallpapers mobile temp-upscaled";
-	const files = fs.readdirSync(folder);
-	let removed = 0;
+async function clean() {
+	await utils.removesFilesFromAifExistsInB(wallpaperTemp, wallpaperToUpscale);
+	await utils.removesFilesFromAifExistsInB(wallpaperToUpscale, wallpaperToConvert);
+	await utils.removesFilesFromAifExistsInB(wallpaperToConvert, outputDownscale);
+	await utils.removesFilesFromAifExistsInB(outputDownscale, outputFinal);
 	
-	await Promise.all(files.map(async (file, index) => {
-		const filePath = path.join(folder, file);
-			await sharp(filePath)
-		  .metadata()
-		  .then(({ width, height }) => {
-				if((width/4 >= height/3) || (height/4 >= width/3)) {
-					console.log(`${index}/${files.length}`);
-					return;
-				}
-				utils.deleteFolder(filePath);
-				console.log(`${index}/${files.length} wrong ratio: ${file}`);
-				removed++
-			})
-	}));
-
-	utils.logGreen(`Removed ${removed} files`);
+	await utils.removesFilesFromAifExistsInB(mobileTemp, wallpaperToUpscaleMobile);
+	await utils.removesFilesFromAifExistsInB(wallpaperToUpscaleMobile, wallpaperToConvertMobile);
+	await utils.removesFilesFromAifExistsInB(wallpaperToConvertMobile, outputMobileDownscale);
+	await utils.removesFilesFromAifExistsInB(outputMobileDownscale, outputMobile);
 }
 
 exports.sortAll = sortStuff;
 exports.upscale = upscale;
+exports.convert = convert;
 exports.downscale = downscale;
 exports.clean = clean;
+exports.cleanBeforeUpscale = cleanBeforeUpscale;
+exports.cleanAfterUpscale = cleanAfterUpscale;
 exports.checkDuplicates = checkDuplicates;
-exports.temp = temp;
