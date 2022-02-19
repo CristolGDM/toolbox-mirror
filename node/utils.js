@@ -22,6 +22,36 @@ function fileExistsAnyExtension(file, folderPath) {
 	return files.indexOf(fileName) > -1;
 }
 
+async function removesFilesFromAifExistsInB(pathA, pathB) {
+	if(!fs.existsSync(pathA)) {
+		logYellow(`${pathA} doesn't exist`);
+		return;
+	}
+	if(!fs.existsSync(pathB)) {
+		logYellow(`${pathB} doesn't exist`);
+		return;
+	}
+
+	const filesA = fs.readdirSync(pathA);
+	const filesB = getListOfFilesWithoutExtension(pathB);
+
+	logBlue(`${pathA} has ${filesA.length} files`);
+	logBlue(`${pathB} has ${filesB.length} files`);
+
+	let deletedFiles = 0;
+
+	await Promise.all(filesA.map(async (file, index) => {
+		if(filesB.indexOf(getFileNameWithoutExtension(file)) > -1) {
+			deleteFolder(path.join(pathA, file));
+			// logBlue(`Will delete ${path.join(pathA, file)}`);
+			deletedFiles++
+		}
+		return;
+	}))
+
+	logGreen(`Deleted ${deletedFiles} from ${pathA}`);
+}
+
 function createFolder(folderPath) {
 	if (!fs.existsSync(folderPath)){
 		logYellow(`=> creating ${folderPath}`);
@@ -106,6 +136,7 @@ exports.deleteDuplicates = deleteDuplicates;
 
 exports.createFolder = createFolder;
 exports.deleteFolder = deleteFolder;
+exports.removesFilesFromAifExistsInB = removesFilesFromAifExistsInB;
 
 exports.logBlue = logBlue;
 exports.logGreen = logGreen;
