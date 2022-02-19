@@ -30,7 +30,7 @@ const imaginarySubs = {
 	},
 	pets: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Pets', 
-		subreddits: "ImaginaryAww, imaginarypets, AdorableDragons",
+		subreddits: "ImaginaryAww, imaginarypets",
 		limit: 50
 	},
 	vehicles: {
@@ -115,7 +115,7 @@ const bootySubs = {
 	},
 	reveal: {
 		folderPath: 'R:\\Game resources\\Battlebacks\\_SPECIAL_\\Reveal',
-		subreddits: "BiggerThanYouThought, OnOff, cosplayonoff, onoffcollages, Upskirt, Underskirts, cleavage, EpicCleavage, boobbounce, BigBoobsGonewild, BustyNaturals, GWBusty, BustyPetite, gonewild, TittyDrop"
+		subreddits: "BiggerThanYouThought, OnOff, cosplayonoff, onoffcollages, Upskirt, Underskirts, cleavage, boobbounce, BigBoobsGonewild, BustyNaturals, GWBusty, BustyPetite, gonewild, TittyDrop"
 	}
 }
 
@@ -147,7 +147,8 @@ const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", 
 												"Lovable-Peril", "MagmaHotsguy", "Marmasghetti", "jaco147", "geergutz", "ClayEnchanter", "castass", "ZENRAMANIAC", "KronalgalVas",
 												"B0B_22", "Taguel16", "Cab0san", "RowzeiChan", "Hollz23", "TripleA2006", "championsgamer1", "Reykurinn", "AgentB90",
 												"comics0026", "AimlessGrace", "axes_and_asses", "ImperatorZor", "HellsJuggernaut", "angelberries", "FoolishMacaroni",
-												"nbolen13", "Space_Fox586", "EwokTheGreatPrp", "EmeraldScales", "ClassicFrancois18", "pweavd", "smolb0i"];
+												"nbolen13", "Space_Fox586", "EwokTheGreatPrp", "EmeraldScales", "ClassicFrancois18", "pweavd", "smolb0i", "improy",
+												"redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark"];
 
 function redditDownload(folderPath, subreddits, time, limit, skipExisting, additionalArguments) {
 	const usedTime = time && validTimeValues[time] ? validTimeValues[time] : validTimeValues.all;
@@ -181,7 +182,7 @@ function imaginaryDownload() {
 		utils.logBlue(`Downloading ${target}`)
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, details.limit ? details.limit : 200, true)
+		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, details.limit ? details.limit : 200, false)
 	}
 }
 
@@ -196,7 +197,7 @@ function bootyDownload() {
 		utils.logBlue(`Downloading ${target}`)
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 1000, false);
+		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 800, true);
 	}
 }
 
