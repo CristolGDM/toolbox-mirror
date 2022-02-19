@@ -36,6 +36,10 @@ function deleteFolder(folderPath) {
   }
 }
 
+function deleteDuplicates(folderPath) {
+	execShell(`C:\\cygwin64\\bin\\bash.exe --login -c 'fdupes --delete --noprompt "${folderPath}"'`)
+}
+
 function isFolder(path) {
 	return path.split(".").length === 1;
 }
@@ -98,6 +102,7 @@ exports.fileExistsAnyExtension = fileExistsAnyExtension;
 exports.getFileNameWithoutExtension = getFileNameWithoutExtension;
 exports.getListOfFilesWithoutExtension = getListOfFilesWithoutExtension;
 exports.isFolder = isFolder;
+exports.deleteDuplicates = deleteDuplicates;
 
 exports.createFolder = createFolder;
 exports.deleteFolder = deleteFolder;
