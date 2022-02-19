@@ -89,6 +89,11 @@ async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeig
 }
 
 async function convertFolderToJpg(inputFolder, outputFolder) {
+	if(!fs.existsSync(inputFolder)) {
+		utils.logYellow(`${inputFolder} doesn't exist`);
+		return;
+	}
+	utils.createFolder(outputFolder);
 	const images = fs.readdirSync(inputFolder);
 	const existingFiles = utils.getListOfFilesWithoutExtension(outputFolder);
 
@@ -124,45 +129,6 @@ async function convertFolderToJpg(inputFolder, outputFolder) {
 
   return;
 }
-
-// async function downscaleFolder(folderPath, desiredWidth, desiredHeight) {
-// 	const files = fs.readdirSync(folderPath);
-// 	const widthFolder = folderPath.replace(path.dirname(folderPath), path.dirname + "-width");
-// 	const heightFolder = folderPath.replace(path.dirname(folderPath), path.dirname + "-height");
-
-// 	for (let i = 0; i < files.length; i++) {
-// 		const file =  files[i];
-// 		const filePath = path.join(folder, file);
-		
-// 		await sharp(filePath)
-// 			.metadata()
-// 			.then(({ width, height }) => {
-// 				if((height/width) === (desiredHeight/desiredWidth)) {
-// 					if(height === desiredHeight) {
-// 						return;
-// 					}
-// 					console.log(file);
-// 					utils.logGreen("=> moving to height folder");
-// 					fs.renameSync(filePath, path.join(heightFolder, file));
-// 				} else {
-// 					if(width === desiredWidth) {
-// 						return;
-// 					}
-// 					console.log(file);
-// 					utils.logGreen("=> moving to width folder");
-// 					fs.renameSync(filePath, path.join(widthFolder, file));
-// 				}
-// 			})
-// 	}
-
-// 	const widthFiles = fs.readdirSync(widthFolder);
-// 	const heightFiles = fs.readdirSync(heightFolder);
-
-// 	for (let j = 0; j < widthFiles.length; j++) {
-// 		const file = widthFiles[j];
-// 		sharp(path.join(widthFolder, file)).resize(desiredWidth, desiredHeight);
-// 	}
-// }
 
 async function upscalePSX(gameName) {
 	const folderLocation = "R:/Emulation/PSX"
