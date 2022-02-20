@@ -6,3 +6,4 @@ bdfr_logs.*
 node_modules
 node-tools/compiled
 other-subs*
+desktop.ini
