@@ -375,7 +375,7 @@ function cleanImaginary() {
 }
 
 function cleanBooty() {
-	let  folders = Object.keys(dungeonSubs).map(key => imaginarySubs[key].folderPath);
+	let  folders = Object.keys(bootySubs).map(key => bootySubs[key].folderPath);
 
 	for (let index = 0; index < folders.length; index++) {
 		const folder = folders[index].replace(/\\/g, "/");
@@ -388,24 +388,13 @@ function cleanBooty() {
 	}
 }
 
-// function cleanYoutubeThumbnails() {
-// 	const youtubeFolder = "K:/Youtube";
-// 	const folders = fs.readdirSync(youtubeFolder);
-// 	const annoyingExtension = " - Videos";
-// 	folders.forEach((folder) => {
-// 		const files = fs.readdirSync(path.join(youtubeFolder, folder));
-// 		if(files.map(utils.getFileNameWithoutExtension).indexOf(folder) > -1 ) {
-// 			return;
-// 		}
-
-// 		files.forEach((file) => {
-// 			const filename = utils.getFileNameWithoutExtension(file);
-// 			if(filename === folder + annoyingExtension) {
-// 				sharp(path.join(youtubeFolder, folder, file)).toFormat("png").toFile(path.join(youtubeFolder, folder, "show.png"));
-// 			}
-// 		})
-// 	})
-// }
+function test() {
+	const testFolder = "E:/Pictures/temp";
+	const dupes = utils.deleteDuplicates(testFolder);
+	utils.logYellow("Found this:");
+	console.log(dupes);
+	return;
+}
 
 exports.validTimeValues = validTimeValues;
 exports.redditDownload = redditDownload;
@@ -427,4 +416,4 @@ exports.cleanUnwanted = cleanUnwanted;
 exports.cleanImaginary = cleanImaginary;
 exports.cleanBooty = cleanBooty;
 
-// exports.cleanYoutubeThumbnails = cleanYoutubeThumbnails;
+exports.test = test;

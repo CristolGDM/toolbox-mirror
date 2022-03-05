@@ -66,8 +66,23 @@ function deleteFolder(folderPath) {
   }
 }
 
+//--summarize and --delete unfortunately not compatible
 function deleteDuplicates(folderPath) {
-	execShell(`C:\\cygwin64\\bin\\bash.exe --login -c 'fdupes --delete --noprompt "${folderPath}"'`)
+	const logFile = path.join(folderPath, "fdupelog.txt");
+	execShell(`C:\\cygwin64\\bin\\bash.exe --login -c 'fdupes --delete --noprompt --sameline "${folderPath}" | tee "${logFile}"'`)
+
+	const log = fs.readFileSync(logFile, 'utf8');
+	console.log(log);
+	logGreen(`=> Found and deleted ${log.split("[-]").length -1} duplicates`);
+
+	const folder = path.dirname(logFile).replace(/\\/g, "/") + "/";
+	console.log(folder);
+	const filesFound = log.split("\n")
+											.filter(file => file.indexOf(folder) > -1)
+											.map(file => path.parse(file.split(folder)[1]).name);
+
+	deleteFolder(logFile);
+	return filesFound;
 }
 
 function isFolder(path) {
