@@ -1,5 +1,3 @@
-const { deleteFolder } = require("./utils.js");
-
 const fs = require("fs");
 const sharp = require("sharp");
 const path = require("path");
@@ -27,6 +25,8 @@ const outputMobileDownscale = "E:/Pictures/zzzWallpapers mobile to downscale";
 
 const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi"];
 
+const knownDupesPath = "E:/Pictures/knownDupes.json";
+
 let finalFiles;
 let tempFiles;
 
@@ -36,12 +36,6 @@ function fileAlreadyExists(fileName) {
 }
 
 async function upscale() {
-	utils.logLine();
-	utils.logYellow("------------------------------------------------------");
-	utils.logYellow("Finished sorting, starting upscale");
-	utils.logYellow("------------------------------------------------------");
-	utils.logLine();
-
 	await upscaler.upscaleFolder(wallpaperTemp, upscaler.models.uniscaleRestore, outputDownscale, 3840);
 	await upscaler.upscaleFolder(mobileTemp, upscaler.models.lollypop, outputMobileDownscale, null, 2400);
 
@@ -357,7 +351,7 @@ async function downscaleMobile() {
 	}))
 }
 
-function cleanBeforeUpscale() {
+async function cleanBeforeUpscale() {
 	const folders = [
 		wallpaperFolder,
 		mobileFolder,
@@ -369,7 +363,10 @@ function cleanBeforeUpscale() {
 		wallpaperToConvertMobile,
 		outputDownscale,
 		outputMobileDownscale
-	]
+	];
+
+	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
+	const knownDupes = await JSON.parse(knownDupesRaw);
 
 	for (let index = 0; index < folders.length; index++) {
 		const folder = folders[index].replace(/\\/g, "/");
@@ -377,26 +374,34 @@ function cleanBeforeUpscale() {
 			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
 			continue;
 		}
-		utils.deleteDuplicates(folder);
-		console.log(`Finished cleaning ${index+1}/${folders.length}`)
+		const foundDupes = utils.deleteDuplicates(folder);
+		foundDupes.map((dupe) => {knownDupes[dupe] = true})
+		console.log(`Finished cleaning ${index+1}/${folders.length}`);
+		fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 	}
 }
 
-function cleanAfterUpscale() {
+async function cleanAfterUpscale() {
 	const folders = [
 		outputFinal,
 		outputMobile
 	]
 
+	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
+	const knownDupes = await JSON.parse(knownDupesRaw);
+
 	for (let index = 0; index < folders.length; index++) {
 		const folder = folders[index].replace(/\\/g, "/");
 		if(!fs.existsSync(folder)) {
 			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
 			continue;
 		}
-		utils.deleteDuplicates(folder);
-		console.log(`Finished cleaning ${index+1}/${folders.length}`)
+		const foundDupes = utils.deleteDuplicates(folder);
+		foundDupes.map((dupe) => {knownDupes[dupe] = true})
+		console.log(`Finished cleaning ${index+1}/${folders.length}`);
 	}
+
+	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 }
 
 async function downscale() {

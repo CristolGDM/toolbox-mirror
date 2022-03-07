@@ -1,7 +1,6 @@
 const utils = require ("./utils.js");
 const path = require("path");
 const fs = require("fs");
-const sharp = require("sharp");
 
 const validTimeValues = {
 	all: "all",
