@@ -1,7 +1,7 @@
-fs = require("fs");
-sharp = require("sharp");
-path = require("path");
-utils = require("./utils.js");
+const path = require("path");
+const fs = require("fs");
+const sharp = require("sharp");
+const utils = require("./utils.js");
 
 const models = {
 	nickelback:  "4x_NickelbackFS_72000_G.pth",
@@ -162,9 +162,37 @@ async function upscalePSX(gameName) {
 	utils.deleteFolder(tempFolder);
 }
 
+async function downscaleFolder(inputPath, outputPath, width, height) {
+	let x = 1;
+	utils.createFolder(outputPath);
+	const targetFiles = fs.readdirSync(inputPath);
+	const doneFiles = fs.readdirSync(outputPath);
+	await Promise.all(targetFiles.map(async (file) => {
+		try {
+			if(doneFiles.indexOf(file) > -1) {
+				x++;
+				return;
+			}
+			await sharp(path.join(inputPath, file))
+			.on("error", (err) => {utils.logRed("on error"); utils.logRed(err)})
+			.resize(width, height, {fit: "outside"})
+			.toFile(path.join(outputPath, file))
+			.then(() => {
+				utils.logYellow(`Downscaled ${x}/${targetFiles.length}: ${file}`);
+				x++;
+			});
+		} catch (error) {
+			utils.logRed("error catch");
+			utils.logRed(`while downscaling ${x}/${targetFiles.length}: ${file}`);
+			utils.logRed(error);
+		}
+	}))
+}
+
 exports.upscaleFolder = upscaleFolder;
 exports.upscaleFolderToOutput = upscaleFolderToOutput;
 exports.convertFolderToJpg = convertFolderToJpg;
 exports.upscalePSX = upscalePSX;
+exports.downscaleFolder = downscaleFolder;
 
 exports.models = models;
