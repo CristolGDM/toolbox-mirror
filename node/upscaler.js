@@ -32,15 +32,21 @@ async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeig
 	const upscaledFolderName = `${inputPath}-upscaled`;
 	utils.createFolder(toUpscalename);
 	utils.createFolder(upscaledFolderName);
+	if(outputPath) {
+		utils.createFolder(outputPath);
+	}
 	utils.logLine();
 	const images = fs.readdirSync(inputPath);
-	const toUpscaleImages = fs.readdirSync(toUpscalename);
-	const upscaledImages = fs.readdirSync(upscaledFolderName);
+	const toUpscaleImages = fs.readdirSync(toUpscalename).map(utils.getFileNameWithoutExtension);
+	const upscaledImages = fs.readdirSync(upscaledFolderName).map(utils.getFileNameWithoutExtension);
+	const doneImages = outputPath ? fs.readdirSync(outputPath).map(utils.getFileNameWithoutExtension) : [];
 	await Promise.all(images.map(async (imageName, index) => {
+		const nameWithoutExtension = utils.getFileNameWithoutExtension(imageName);
 		if(utils.isFolder(imageName)) {
 			return;
 		}
-		if(toUpscaleImages.indexOf(imageName) > -1 || upscaledImages.indexOf(imageName) > -1) {
+		if(toUpscaleImages.indexOf(nameWithoutExtension) > -1 || upscaledImages.indexOf(nameWithoutExtension) > -1 || doneImages.indexOf(nameWithoutExtension) > -1) {
+			utils.logYellow(`${index+1} out of ${images.length}: ${nameWithoutExtension} already exists, skipping`);
 			return;
 		}
 		await sharp(path.join(inputPath, imageName))
