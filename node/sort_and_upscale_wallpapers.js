@@ -298,57 +298,11 @@ async function sortStuff() {
 }
 
 async function downscaleDesktop() {
-	let x = 1;
-	const toDownscaleWallpapers = fs.readdirSync(outputDownscale);
-	const doneFiles = fs.readdirSync(outputFinal);
-	await Promise.all(toDownscaleWallpapers.map(async (file) => {
-		try {
-			if(doneFiles.indexOf(file) > -1) {
-				x++;
-				return;
-			}
-			await sharp(path.join(outputDownscale, file))
-			.on("error", (err) => {utils.logRed("on error"); utils.logRed(err)})
-			.resize(3840, 2160, {fit: "outside"})
-			.toFile(path.join(outputFinal, file))
-			.then(() => {
-				utils.logYellow(`Desktop ${x+1}/${toDownscaleWallpapers.length}: ${file}`);
-				x++;
-			});
-		} catch (error) {
-			utils.logRed("error catch");
-			utils.logRed(`Desktop ${x+1}/${toDownscaleWallpapers.length}: ${file}`);
-			utils.logRed(error);
-		}
-	}))
+	upscaler.downscaleFolder(outputDownscale, outputFinal, 3840, 2160);
 }
 
 async function downscaleMobile() {
-	let x = 1;
-	const finalMobileWallpapers = fs.readdirSync(outputMobileDownscale);
-	const doneFilesMobile = fs.readdirSync(outputMobile);
-	await Promise.all(finalMobileWallpapers.map(async (file) => {
-		try {
-			if(doneFilesMobile.indexOf(file) > -1) {
-				x++;
-				utils.logBlue("Already exists");
-				return;
-			}
-			await sharp(path.join(outputMobileDownscale, file))
-			.on("error", (err) => {utils.logRed("on error"); utils.logRed(err)})
-			.resize(1080, 2400, {fit: "outside"})
-			.toFile(path.join(outputMobile, file))
-			.then(() => {
-				utils.logYellow(`Mobile ${x+1}/${finalMobileWallpapers.length}: ${file}`);
-				x++;
-				return;
-			});
-		} catch (error) {
-			utils.logRed("error catch");
-			utils.logRed(`Mobile ${x+1}/${finalMobileWallpapers.length}: ${file}`);
-			utils.logRed(error);
-		}
-	}))
+	upscaler.downscaleFolder(outputMobileDownscale, outputMobile, 1080, 2400);
 }
 
 async function cleanBeforeUpscale() {
