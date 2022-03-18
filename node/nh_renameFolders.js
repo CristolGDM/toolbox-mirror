@@ -1,8 +1,8 @@
 fs = require("fs");
 path = require("path");
 
-const newFoldersLocation = "E:/Pictures/Comics/_SPECIAL_/Drawings";
-const oldFoldersLocation = "E:/Pictures/Comics/_SPECIAL_/zzzDrawings";
+const newFoldersLocation = "K:/_SPECIAL_/Drawings";
+const oldFoldersLocation = "K:/_SPECIAL_/zzzDrawings";
 const separator = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
 
 const folders = fs.readdirSync(oldFoldersLocation);

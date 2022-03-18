@@ -105,15 +105,15 @@ const imaginarySubs = {
 
 const bootySubs = {
 	east: {
-		folderPath: 'R:\\Game resources\\Battlebacks\\_SPECIAL_\\East',
+		folderPath: 'K:\\_SPECIAL_\\East',
 		subreddits: "bustyasians, juicyasians, asianandlovingit, asian_gifs, AsianNSFW, AikaYumeno, AsianPornIn1Minute, hugeboobsjav, NSFW_Japan, Ai_Shinozaki, AsianHotties, AsianCuties, TeramotoRio, FansOfRaMu, AsiansGoneWild, AsianPorn, JapanesePorn2, ShionUtsunomiya, ai_uehara, Aimi_Yoshikawa, JuliaJAV, junamaki, KahoShibuya, KureaHasumi, RioHamasaki, SakiYanase, SakuraKirishima, shioritsukada, YukiJin, RenaMomozono, YuShinoda, HanaHarunaJAV"
 	},
 	end: {
-		folderPath: 'R:\\Game resources\\Battlebacks\\_SPECIAL_\\End',
+		folderPath: 'K:\\_SPECIAL_\\End',
 		subreddits: "whenitgoesin, O_Faces, pronebone, quiver, Orgasms"
 	},
 	reveal: {
-		folderPath: 'R:\\Game resources\\Battlebacks\\_SPECIAL_\\Reveal',
+		folderPath: 'K:\\_SPECIAL_\\Reveal',
 		subreddits: "BiggerThanYouThought, OnOff, cosplayonoff, onoffcollages, Upskirt, Underskirts, cleavage, boobbounce, BigBoobsGonewild, BustyNaturals, GWBusty, BustyPetite, gonewild, TittyDrop"
 	}
 }
@@ -137,8 +137,8 @@ const dungeonSubs = {
 	}
 }
 
-const nhDownloadFolder = "R:/Game resources/Battlebacks/_SPECIAL_/zzzDrawings";
-const nhUsedFolder = "R:/Game resources/Battlebacks/_SPECIAL_/Drawings";
+const nhDownloadFolder = "K:/_SPECIAL_/zzzDrawings";
+const nhUsedFolder = "K:/_SPECIAL_/Drawings";
 
 const forbiddenDomains = ["instagram.fbna1-2.fna.fbcdn.net", "instagram.fbna1-1.fna.fbcdn.net", "youtube.com", "youtu.be", "jp.spankbang.com"];
 const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", "VedaDragon", "BeardyBennett", "CharmanterPanter", "Ikiera",
