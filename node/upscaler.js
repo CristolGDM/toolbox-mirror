@@ -162,6 +162,61 @@ async function upscalePSX(gameName) {
 	utils.deleteFolder(tempFolder);
 }
 
+async function upscaleScreenshots() {
+	const screenshotFolder = "E:/Pictures/Screenshots";
+	const outputFolder = "E:/Pictures/Screenshots upscaled";
+	const folders = fs.readdirSync(screenshotFolder).filter((folder) => {return !folder.startsWith("zzz")});
+
+	for (let i = 0; i < folders.length; i++) {
+		const folder = folders[i];
+		const tempFolderName = "zzz"+folder;
+		const origFiles = fs.readdirSync(path.join(screenshotFolder, folder));
+
+		if(!origFiles || !origFiles.length) {
+			continue;
+		}
+
+		let doneFiles = [];
+		if(fs.existsSync(path.join(outputFolder, folder))) {
+			doneFiles = fs.readdirSync(path.join(outputFolder, folder)).map(utils.getFileNameWithoutExtension);
+		};
+
+		const toUpscaleFiles = [];
+
+		for (let index = 0; index < origFiles.length; index++) {
+			const imageName = origFiles[index];
+			if(fs.lstatSync(path.join(screenshotFolder, folder, imageName)).isDirectory() ) {
+				continue;
+			}
+			if(doneFiles.indexOf(utils.getFileNameWithoutExtension(imageName)) === -1) {
+				toUpscaleFiles.push(imageName);
+				// toUpscaleFiles.writeFileSync(path.join(screenshotFolder, folder, imageName), path.join(screenshotFolder, tempFolderName, imageName));
+			}
+		}
+		if(toUpscaleFiles.length === 0) {
+			utils.logBlue(`${i+1} out of ${folders.length}: ${folder} has nothing to upscale`);
+			continue;
+		}
+		utils.createFolder(path.join(screenshotFolder, tempFolderName));
+		toUpscaleFiles.forEach((file) => {
+			fs.writeFileSync(path.join(screenshotFolder, tempFolderName, file), fs.readFileSync(path.join(screenshotFolder, folder, file)));
+		})
+
+		console.log(" ");
+		utils.logBlue(utils.separator(18));
+		console.log(" ");
+		utils.logBlue(`Treating folder /${folder} (${i+1} out of ${folders.length})`)
+		console.log(" ");
+
+		await upscaleFolder(path.join(screenshotFolder, tempFolderName), models.universalSharp, path.join(screenshotFolder, tempFolderName+"-downscale"), 3840);
+		await downscaleFolder(path.join(screenshotFolder, tempFolderName+"-downscale"), path.join(outputFolder, folder), 3840, 2160);
+		utils.deleteFolder(path.join(screenshotFolder, tempFolderName));
+		utils.deleteFolder(path.join(screenshotFolder, tempFolderName+"-downscale"));
+		utils.deleteFolder(path.join(screenshotFolder, tempFolderName+"-toscale"));
+		utils.deleteFolder(path.join(screenshotFolder, tempFolderName+"-upscaled"));
+	}
+}
+
 async function downscaleFolder(inputPath, outputPath, width, height) {
 	let x = 1;
 	utils.createFolder(outputPath);
@@ -193,6 +248,7 @@ exports.upscaleFolder = upscaleFolder;
 exports.upscaleFolderToOutput = upscaleFolderToOutput;
 exports.convertFolderToJpg = convertFolderToJpg;
 exports.upscalePSX = upscalePSX;
+exports.upscaleScreenshots = upscaleScreenshots;
 exports.downscaleFolder = downscaleFolder;
 
 exports.models = models;
