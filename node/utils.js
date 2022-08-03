@@ -85,6 +85,52 @@ function deleteDuplicates(folderPath) {
 	return filesFound;
 }
 
+function deleteSimilar(folderPath, video) {
+	const logname = video ? "czkwlog-video.txt" : "czkwlog.txt";
+	const tempLogFile = path.join(folderPath, logname);
+	let deleted = 0;
+	execShell(`E:\\Downloads\\windows_czkawka_cli.exe ${video ? "video" : "image"} --directories "${folderPath}" -f "${tempLogFile}"`);
+
+	const log = fs.readFileSync(tempLogFile, 'utf8').split("\n");
+	let filesGroups = [];
+	let temp = [];
+	log.map(line => {
+		if(line && line.length) {
+			temp.push(line);
+		} else if (temp.length) {
+			filesGroups.push(temp);
+			temp = [];
+		}
+	});
+
+	if(temp.length > 0) {
+		filesGroups.push(temp);
+	}
+	filesGroups = filesGroups.filter((group) => {return group.length >= 3})
+													.map((group) => {
+														group.shift();
+														group = group.map((file) => {
+															let split = file.split(" - ");
+															split = split.slice(0, video ? -1 : -3);
+															return split.join(" - ");
+														})
+														return group;
+													});
+	filesGroups.forEach((group) => {
+		const files = [...group];
+		files.shift();
+		files.forEach((file) => {
+			deleteFolder(file);
+			deleted++;
+		})
+	});
+	logGreen(`=> Found and deleted ${deleted} similar ${video ? "videos" : "images"}`);
+	const filesFound = filesGroups.flat().map((file) => {
+		return path.basename(file, path.extname(file))
+	});
+	return filesFound;
+}
+
 function isFolder(path) {
 	return path.split(".").length === 1;
 }
@@ -151,6 +197,7 @@ exports.deleteDuplicates = deleteDuplicates;
 
 exports.createFolder = createFolder;
 exports.deleteFolder = deleteFolder;
+exports.deleteSimilar = deleteSimilar;
 exports.removesFilesFromAifExistsInB = removesFilesFromAifExistsInB;
 
 exports.logBlue = logBlue;

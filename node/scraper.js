@@ -13,15 +13,15 @@ const validTimeValues = {
 const imaginarySubs = {
 	chill: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Chill', 
-		subreddits: "ImaginaryColorscapes, Moescape, ImaginaryInteriors, ImaginarySliceOfLife"
+		subreddits: "ImaginaryColorscapes, ImaginaryInteriors, ImaginarySliceOfLife, Moescape"
 	},
 	characters: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Characters', 
-		subreddits: "ImaginaryCharacters, ImaginaryArchers, ImaginaryClerics, ImaginaryAssassins, ImaginaryKnights, ImaginaryNobles, ImaginaryScholars, ImaginarySoldiers, ImaginaryWarriors, ImaginaryWizards, ImaginaryDwarves, ImaginaryElves, ImaginaryHumans, ImaginaryOrcs, armoredwomen, ImaginAsian, ReasonableFantasy, imaginarybards, ImaginaryArtists, ImaginaryNatives, ImaginaryVikings, ImaginaryWitches, ImaginaryNinjas, ImaginaryGnomes, ImaginaryMerchants, ImaginarySamurai"
+		subreddits: "armoredwomen, ImaginaryArchers, ImaginaryArtists, ImaginaryAssassins, imaginarybards, ImaginaryCharacters, ImaginaryClerics, ImaginaryDwarves, ImaginaryElves, ImaginaryGnomes, ImaginaryHumans, ImaginaryKnights, ImaginaryMerchants, ImaginaryNatives, ImaginaryNinjas, ImaginaryNobles, ImaginaryOrcs, ImaginarySamurai, ImaginaryScholars, ImaginarySoldiers, ImaginaryVikings, ImaginaryWarriors, ImaginaryWitches, ImaginaryWizards, ImaginAsian, ReasonableFantasy"
 	},
 	items: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Items', 
-		subreddits: "ImaginaryArmor, ImaginaryWeaponry, ImaginaryAetherpunk"
+		subreddits: "ImaginaryAetherpunk, ImaginaryArmor, ImaginaryWeaponry" 
 	},
 	mounts: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Mounts', 
@@ -34,7 +34,7 @@ const imaginarySubs = {
 	},
 	vehicles: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Vehicles', 
-		subreddits: "ImaginaryWarships, ImaginaryVehicles, ImaginaryAirships, ImaginaryAviation, Imaginaryvessels, ImaginaryStarships"
+		subreddits: "ImaginaryAirships, ImaginaryAviation, ImaginaryStarships, ImaginaryVehicles, Imaginaryvessels, ImaginaryWarships" 
 	},
 	pokemon: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Pokemon', 
@@ -42,40 +42,40 @@ const imaginarySubs = {
 	},
 	monster_characters: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Monster characters', 
-		subreddits: "ImaginaryImmortals, ImaginaryAngels, ImaginaryFaeries, ImaginaryMerfolk, ImaginaryDemons, ImaginaryMonsterGirls, CelestialBodies, ImaginaryCentaurs, ImaginaryGiants, ImaginaryGoblins, ImaginaryVampires, ImaginaryWerewolves"
+		subreddits: "CelestialBodies, ImaginaryAngels, ImaginaryCentaurs, ImaginaryDemons, ImaginaryFaeries, ImaginaryGiants, ImaginaryGoblins, ImaginaryImmortals, ImaginaryMerfolk, ImaginaryMonsterGirls, ImaginaryVampires, ImaginaryWerewolves" 
 	},
 	monsters: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Monsters', 
-		subreddits: "ImaginaryMonsters, ImaginaryDragons, ImaginaryElementals, ImaginaryHorrors, ImaginaryHybrids, ImaginaryLeviathans, ImaginaryUndead, ImaginaryWorldEaters, ImaginaryBeasts, ImaginaryBehemoths, BadAssDragons, ImaginaryTrolls, ImaginaryDinosaurs, ImaginarySpirits"
+		subreddits: "BadAssDragons, ImaginaryBeasts, ImaginaryBehemoths, ImaginaryDinosaurs, ImaginaryElementals, ImaginaryHorrors, ImaginaryHybrids, ImaginaryLeviathans, ImaginaryMonsters, ImaginarySpirits, ImaginaryTrolls, ImaginaryUndead, ImaginaryWorldEaters"
 	},
-	monsters2: {
+	dragons: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Monsters', 
 		subreddits: "ImaginaryDragons",
-		limit: 50
+		limit: 150
 	},
 	places: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Places', 
-		subreddits: "ImaginaryCityscapes, ImaginaryHellscapes, ImaginaryPathways, ImaginaryWastelands, ImaginaryWorlds, ImaginaryPortals, ImaginaryVillages, ImaginaryWalls"
+		subreddits: "ImaginaryCityscapes, ImaginaryHellscapes, ImaginaryPathways, ImaginaryPortals, ImaginaryVillages, ImaginaryWalls, ImaginaryWastelands, ImaginaryWorlds" 
 	},
 	nature: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Nature', 
-		subreddits: "ImaginarySeascapes, ImaginarySkyscapes, ImaginaryWildlands, ImaginaryJungles, ImaginaryAutumnscapes, ImaginaryWinterscapes, ImaginaryCanyons, ImaginaryCaves, ImaginaryForests, ImaginaryDeserts, ImaginaryIslands, ImaginaryLakes, ImaginaryMountains, ImaginaryRivers, ImaginarySwamps, ImaginaryTrees, ImaginaryVolcanoes, ImaginaryWaterfalls"
+		subreddits: "ImaginaryAutumnscapes, ImaginaryCanyons, ImaginaryCaves, ImaginaryDeserts, ImaginaryForests, ImaginaryIslands, ImaginaryJungles, ImaginaryLakes, ImaginaryMountains, ImaginaryRivers, ImaginarySeascapes, ImaginarySkyscapes, ImaginarySwamps, ImaginaryTrees, ImaginaryVolcanoes, ImaginaryWaterfalls, ImaginaryWildlands, ImaginaryWinterscapes" 
 	},
 	scenes: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Scenes', 
-		subreddits: "ImaginaryWeather, ImaginaryBattlefields, ImaginaryFeels, ImaginarySliceOfLife, ImaginaryGatherings"
+		subreddits: "ImaginaryBattlefields, ImaginaryFeels, ImaginaryGatherings, ImaginarySliceOfLife, ImaginaryWeather" 
 	},
 	buildings: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Buildings', 
-		subreddits: "ImaginaryArchitecture, ImaginaryCastles, ImaginaryDwellings, ImaginaryLibraries, ImaginaryTaverns, ImaginaryInteriors, ImaginaryFactories, ImaginaryMonuments, ImaginaryPrisons, ImaginaryRuins, ImaginaryTowers, ImaginaryTemples"
+		subreddits: "ImaginaryArchitecture, ImaginaryCastles, ImaginaryDwellings, ImaginaryFactories, ImaginaryInteriors, ImaginaryLibraries, ImaginaryMonuments, ImaginaryPrisons, ImaginaryRuins, ImaginaryTaverns, ImaginaryTemples, ImaginaryTowers" 
 	},
 	scifi: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi', 
-		subreddits: "ImaginaryCyberpunk, ImaginaryFutureWar, ImaginaryFuturism, ImaginaryMechs, ImaginaryRobotics, futureporn"
+		subreddits: "futureporn, ImaginaryCyberpunk, ImaginaryFutureWar, ImaginaryFuturism, ImaginaryMechs, ImaginaryRobotics" 
 	},
 	scifiCharacters: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Characters', 
-		subreddits: "ImaginaryCybernetics, ImaginaryAstronauts"
+		subreddits: "ImaginaryAstronauts, ImaginaryCybernetics"
 	},
 	aliens: {
 		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Aliens', 
@@ -95,26 +95,26 @@ const imaginarySubs = {
 	},
 	wallpapers: {
 		folderPath: 'E:\\Pictures\\Wallpapers', 
-		subreddits: "WQHD_Wallpaper, wallpapers, mtgporn"
+		subreddits: "mtgporn, wallpapers, WQHD_Wallpaper" 
 	},
 	wallpapers_mobile: {
 		folderPath: 'E:\\Pictures\\Wallpapers mobile', 
-		subreddits: "MobileWallpaper, Verticalwallpapers, AnimePhoneWallpapers"
+		subreddits: "AnimePhoneWallpapers, MobileWallpaper, Verticalwallpapers" 
 	},
 };
 
 const bootySubs = {
 	east: {
 		folderPath: 'K:\\_SPECIAL_\\East',
-		subreddits: "bustyasians, juicyasians, asianandlovingit, asian_gifs, AsianNSFW, AikaYumeno, AsianPornIn1Minute, hugeboobsjav, NSFW_Japan, Ai_Shinozaki, AsianHotties, AsianCuties, TeramotoRio, FansOfRaMu, AsiansGoneWild, AsianPorn, JapanesePorn2, ShionUtsunomiya, ai_uehara, Aimi_Yoshikawa, JuliaJAV, junamaki, KahoShibuya, KureaHasumi, RioHamasaki, SakiYanase, SakuraKirishima, shioritsukada, YukiJin, RenaMomozono, YuShinoda, HanaHarunaJAV"
+		subreddits: "Ai_Shinozaki, AikaYumeno, Aimi_Yoshikawa, asian_gifs, asianandlovingit, AsianCuties, AsianHotties, AsianNSFW, AsianPorn, AsianPornIn1Minute, AsiansGoneWild, bustyasians, FansOfRaMu, HanaHarunaJAV, JapanesePorn2, juicyasians, JuliaJAV, junamaki, KahoShibuya, KureaHasumi, NSFW_Japan, RenaMomozono, RioHamasaki, SakiYanase, SakuraKirishima, ShionUtsunomiya, shioritsukada, TeramotoRio, YukiJin, YuShinoda" 
 	},
 	end: {
 		folderPath: 'K:\\_SPECIAL_\\End',
-		subreddits: "whenitgoesin, O_Faces, pronebone, quiver, Orgasms"
+		subreddits: "O_Faces, Orgasms, pronebone, quiver, whenitgoesin" 
 	},
 	reveal: {
 		folderPath: 'K:\\_SPECIAL_\\Reveal',
-		subreddits: "BiggerThanYouThought, OnOff, cosplayonoff, onoffcollages, Upskirt, Underskirts, cleavage, boobbounce, BigBoobsGonewild, BustyNaturals, GWBusty, BustyPetite, gonewild, TittyDrop"
+		subreddits: "BigBoobsGonewild, BiggerThanYouThought, boobbounce, BustyNaturals, BustyPetite, cleavage, cosplayonoff, gonewild, GWBusty, OnOff, onoffcollages, TittyDrop, Underskirts, Upskirt" ,
 	}
 }
 
@@ -140,14 +140,14 @@ const dungeonSubs = {
 const nhDownloadFolder = "K:/_SPECIAL_/zzzDrawings";
 const nhUsedFolder = "K:/_SPECIAL_/Drawings";
 
-const forbiddenDomains = ["instagram.fbna1-2.fna.fbcdn.net", "instagram.fbna1-1.fna.fbcdn.net", "youtube.com", "youtu.be", "jp.spankbang.com"];
+const forbiddenDomains = ["instagram.fbna1-2.fna.fbcdn.net", "instagram.fbna1-1.fna.fbcdn.net", "youtube.com", "youtu.be", "jp.spankbang.com", "xhamster.com", "xhamster49.com"];
 const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", "VedaDragon", "BeardyBennett", "CharmanterPanter", "Ikiera",
 												"RedPersik", "TheGamedawg", "Meraugis", "NeoTheProtogen", "SnickerToodles", "UnpaidPigeon", "kazmatazzzz", "Jaybaybay2838", 
 												"Lovable-Peril", "MagmaHotsguy", "Marmasghetti", "jaco147", "geergutz", "ClayEnchanter", "castass", "ZENRAMANIAC", "KronalgalVas",
 												"B0B_22", "Taguel16", "Cab0san", "RowzeiChan", "Hollz23", "TripleA2006", "championsgamer1", "Reykurinn", "AgentB90",
 												"comics0026", "AimlessGrace", "axes_and_asses", "ImperatorZor", "HellsJuggernaut", "angelberries", "FoolishMacaroni",
 												"nbolen13", "Space_Fox586", "EwokTheGreatPrp", "EmeraldScales", "ClassicFrancois18", "pweavd", "smolb0i", "improy",
-												"redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie"];
+												"redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113"];
 
 function redditDownload(folderPath, subreddits, time, limit, skipExisting, additionalArguments) {
 	const usedTime = time && validTimeValues[time] ? validTimeValues[time] : validTimeValues.all;
@@ -170,49 +170,31 @@ function redditDownload(folderPath, subreddits, time, limit, skipExisting, addit
 									${additional} --verbose`)
 }
 
-function imaginaryDownload() {
-	const targets = Object.keys(imaginarySubs);
+function sectionDownload(subs, limit) {
+	const categories = Object.keys(subs);
 
-	for (let i = 0; i < targets.length; i++) {
-		const target = targets[i];
-		const details = imaginarySubs[target];
+	for (let i = 0; i < categories.length; i++) {
+		const category = categories[i];
+		const details = subs[category];
 		
 		utils.logLine();
-		utils.logBlue(`Downloading ${target}`)
+		utils.logBlue(`Downloading ${category}, folder ${i+1}/${categories.length}`);
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, details.limit ? details.limit : 200, false)
+		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, details.limit ? details.limit : limit, false)
 	}
 }
 
+function imaginaryDownload() {
+	sectionDownload(imaginarySubs, 200)
+};
+
 function bootyDownload() {
-	const targets = Object.keys(bootySubs);
-
-	for (let i = 0; i < targets.length; i++) {
-		const target = targets[i];
-		const details = bootySubs[target];
-		
-		utils.logLine();
-		utils.logBlue(`Downloading ${target}`)
-		utils.logLine();
-
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 800, false);
-	}
+	sectionDownload(bootySubs, 800);
 }
 
 function dungeonDownload() {
-	const targets = Object.keys(dungeonSubs);
-
-	for (let i = 0; i < targets.length; i++) {
-		const target = targets[i];
-		const details = dungeonSubs[target];
-		
-		utils.logLine();
-		utils.logBlue(`Downloading ${target}`)
-		utils.logLine();
-
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, 50, true);
-	}
+	sectionDownload(dungeonSubs, 50);
 }
 
 function redditCatchup(folderPath, subredditName) {
@@ -358,23 +340,23 @@ async function cleanUnwanted() {
 	utils.logBlue(`Deleted ${found} not so pretty pictures`);
 }
 
-function cleanImaginary() {
-	let  folders = Object.keys(imaginarySubs).map(key => imaginarySubs[key].folderPath);
-	folders = folders.concat(Object.keys(dungeonSubs).map(key => dungeonSubs[key].folderPath));
+// function cleanImaginary() {
+// 	let  folders = Object.keys(imaginarySubs).map(key => imaginarySubs[key].folderPath);
+// 	folders = folders.concat(Object.keys(dungeonSubs).map(key => dungeonSubs[key].folderPath));
 
-	for (let index = 0; index < folders.length; index++) {
-		const folder = folders[index].replace(/\\/g, "/");
-		if(!fs.existsSync(folder)) {
-			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
-			continue;
-		}
-		utils.deleteDuplicates(folder);
-		console.log(`Finished cleaning ${index+1}/${folders.length}`)
-	}
-}
+// 	for (let index = 0; index < folders.length; index++) {
+// 		const folder = folders[index].replace(/\\/g, "/");
+// 		if(!fs.existsSync(folder)) {
+// 			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
+// 			continue;
+// 		}
+// 		utils.deleteDuplicates(folder);
+// 		console.log(`Finished cleaning ${index+1}/${folders.length}`)
+// 	}
+// }
 
 function cleanBooty() {
-	let  folders = Object.keys(bootySubs).map(key => bootySubs[key].folderPath);
+	let folders = [... new Set(Object.keys(bootySubs).map(key => bootySubs[key].folderPath))];
 
 	for (let index = 0; index < folders.length; index++) {
 		const folder = folders[index].replace(/\\/g, "/");
@@ -383,6 +365,8 @@ function cleanBooty() {
 			continue;
 		}
 		utils.deleteDuplicates(folder);
+		utils.deleteSimilar(folder);
+		utils.deleteSimilar(folder, true);
 		console.log(`Finished cleaning ${index+1}/${folders.length}`)
 	}
 }
@@ -412,7 +396,7 @@ exports.sortArt = sortArt;
 
 exports.forbiddenUsers = forbiddenUsers;
 exports.cleanUnwanted = cleanUnwanted;
-exports.cleanImaginary = cleanImaginary;
+// exports.cleanImaginary = cleanImaginary;
 exports.cleanBooty = cleanBooty;
 
 exports.test = test;

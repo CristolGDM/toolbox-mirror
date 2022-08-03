@@ -41,7 +41,11 @@ async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeig
 	const upscaledImages = fs.readdirSync(upscaledFolderName).map(utils.getFileNameWithoutExtension);
 	const doneImages = outputPath ? fs.readdirSync(outputPath).map(utils.getFileNameWithoutExtension) : [];
 	await Promise.all(images.map(async (imageName, index) => {
-		const nameWithoutExtension = utils.getFileNameWithoutExtension(imageName);
+		if(imageName.endsWith(".txt"))
+			{
+				return;
+			}		
+ const nameWithoutExtension = utils.getFileNameWithoutExtension(imageName);
 		if(utils.isFolder(imageName)) {
 			return;
 		}
@@ -95,6 +99,11 @@ async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeig
 }
 
 async function convertFolderToJpg(inputFolder, outputFolder) {
+	utils.logLine();
+	utils.logGreen("________");
+	utils.logGreen(`Converting ${inputFolder} to Jpg`);
+	utils.logGreen("________");
+	utils.logLine();
 	if(!fs.existsSync(inputFolder)) {
 		utils.logYellow(`${inputFolder} doesn't exist`);
 		return;
@@ -170,56 +179,32 @@ async function upscalePSX(gameName) {
 
 async function upscaleScreenshots() {
 	const screenshotFolder = "E:/Pictures/Screenshots";
+	const screenshotFolderTemp = "E:/Pictures/zzScreenshots temp";
 	const outputFolder = "E:/Pictures/Screenshots upscaled";
-	const folders = fs.readdirSync(screenshotFolder).filter((folder) => {return !folder.startsWith("zzz")});
+	const outputToDownscale = "E:/Pictures/zzScreenshots to downscale";
+	const folders = fs.readdirSync(screenshotFolder).filter((folder) => {return !folder.startsWith("zz")});
+
+	utils.execShell(`cp -R "${screenshotFolder}" "${screenshotFolderTemp}"`);
+	utils.execShell(`cp -R "${outputFolder}" "${outputToDownscale}"`);
 
 	for (let i = 0; i < folders.length; i++) {
-		const folder = folders[i];
-		const tempFolderName = "zzz"+folder;
-		const origFiles = fs.readdirSync(path.join(screenshotFolder, folder));
+		const folderName = folders[i];
+		utils.logLine();
+		utils.logGreen("------------------------------------------");
+		utils.logGreen(`Upscaling ${folderName} ${i+1}/${folders.length}`);
+		utils.logGreen("------------------------------------------");
+		utils.logLine();
+		await upscaler.upscaleFolder(path.join(screenshotFolderTemp, folderName), upscaler.models.universalSharp, path.join(outputToDownscale, folderName), 3840);
+	}
 
-		if(!origFiles || !origFiles.length) {
-			continue;
-		}
-
-		let doneFiles = [];
-		if(fs.existsSync(path.join(outputFolder, folder))) {
-			doneFiles = fs.readdirSync(path.join(outputFolder, folder)).map(utils.getFileNameWithoutExtension);
-		};
-
-		const toUpscaleFiles = [];
-
-		for (let index = 0; index < origFiles.length; index++) {
-			const imageName = origFiles[index];
-			if(fs.lstatSync(path.join(screenshotFolder, folder, imageName)).isDirectory() ) {
-				continue;
-			}
-			if(doneFiles.indexOf(utils.getFileNameWithoutExtension(imageName)) === -1) {
-				toUpscaleFiles.push(imageName);
-				// toUpscaleFiles.writeFileSync(path.join(screenshotFolder, folder, imageName), path.join(screenshotFolder, tempFolderName, imageName));
-			}
-		}
-		if(toUpscaleFiles.length === 0) {
-			utils.logBlue(`${i+1} out of ${folders.length}: ${folder} has nothing to upscale`);
-			continue;
-		}
-		utils.createFolder(path.join(screenshotFolder, tempFolderName));
-		toUpscaleFiles.forEach((file) => {
-			fs.writeFileSync(path.join(screenshotFolder, tempFolderName, file), fs.readFileSync(path.join(screenshotFolder, folder, file)));
-		})
-
-		console.log(" ");
-		utils.logBlue(utils.separator(18));
-		console.log(" ");
-		utils.logBlue(`Treating folder /${folder} (${i+1} out of ${folders.length})`)
-		console.log(" ");
-
-		await upscaleFolder(path.join(screenshotFolder, tempFolderName), models.universalSharp, path.join(screenshotFolder, tempFolderName+"-downscale"), 3840);
-		await downscaleFolder(path.join(screenshotFolder, tempFolderName+"-downscale"), path.join(outputFolder, folder), 3840, 2160);
-		utils.deleteFolder(path.join(screenshotFolder, tempFolderName));
-		utils.deleteFolder(path.join(screenshotFolder, tempFolderName+"-downscale"));
-		utils.deleteFolder(path.join(screenshotFolder, tempFolderName+"-toscale"));
-		utils.deleteFolder(path.join(screenshotFolder, tempFolderName+"-upscaled"));
+	for (let i = 0; i < folders.length; i++) {
+		const folderName = folders[i];
+		utils.logLine();
+		utils.logGreen("------------------------------------------");
+		utils.logGreen(`Downscaling ${folderName} ${i+1}/${folders.length}`);
+		utils.logGreen("------------------------------------------");
+		utils.logLine();
+		await upscaler.downscaleFolder(path.join(outputToDownscale, folderName), path.join(outputFolder, folderName), 3840, 2160);
 	}
 }
 
@@ -235,7 +220,10 @@ async function downscaleFolder(inputPath, outputPath, width, height) {
 				return;
 			}
 			await sharp(path.join(inputPath, file))
-			.on("error", (err) => {utils.logRed("on error"); utils.logRed(err)})
+			.on("error", (err) => {
+				utils.logRed("on error"); 
+				utils.logRed(err);
+			})
 			.resize(width, height, {fit: "outside"})
 			.toFile(path.join(outputPath, file))
 			.then(() => {

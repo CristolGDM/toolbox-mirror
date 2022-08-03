@@ -60,6 +60,9 @@ function checkDuplicates() {
 };
 
 async function sortStuff() {
+	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
+	const knownDupes = await JSON.parse(knownDupesRaw);
+	let foundDupes = 0;
 	utils.createFolder(wallpaperTemp);
 	utils.createFolder(mobileTemp);
 	const imaginaryFolders = fs.readdirSync(imaginaryFolder).filter((folder) => {
@@ -102,16 +105,29 @@ async function sortStuff() {
 			}
 
 			let imageName = path.join(imaginaryFolder, folder, image);
+			if(image.endsWith("unknown_video") || image.endsWith("UNKNOWN_VIDEO")) {
+				utils.logRed(`=> cleaning unknown video format`);
+				const imageNameWithRealExtension = utils.getFileNameWithoutExtension(image) + ".png";
+				fs.renameSync(imageName, path.join(imaginaryFolder, folder, imageNameWithRealExtension));
+				image = imageNameWithRealExtension;
+				imageName =  path.join(imaginaryFolder, folder, imageNameWithRealExtension);
+			}
 			if(image.length > 200) {
 				utils.logRed(`=> shortening long name`);
-				const newImageName = image.substr(0, 100) + image.substr(image.length - 100);
-				fs.renameSync(imageName, path.join(imaginaryFolder, folder, newImageName));
-				image = newImageName;
-				imageName =  path.join(imaginaryFolder, folder, newImageName);
+				const shortenedImageName = image.substring(0, 100) + image.substring(image.length - 100);
+				fs.renameSync(imageName, path.join(imaginaryFolder, folder, shortenedImageName));
+				image = shortenedImageName;
+				imageName =  path.join(imaginaryFolder, folder, shortenedImageName);
 			}
 
 			if(fileAlreadyExists(image)) {
 				console.log("=> Already exists, skipping");
+				return;
+			}
+
+			if(knownDupes[utils.getFileNameWithoutExtension(image)]){
+				utils.logRed(`=> is known duplicate`);
+				foundDupes++;
 				return;
 			}
 
@@ -152,7 +168,6 @@ async function sortStuff() {
 		}));
 	}
 
-
 	utils.logLine();
 	utils.logBlue("------------------------------------------------------");
 	utils.logBlue("Sorting mobile folder...");
@@ -188,10 +203,16 @@ async function sortStuff() {
 		let imageName = `${mobileFolder}/${image}`;
 		if(image.length > 200) {
 			utils.logRed(`=> shortening long name`);
-			const newImageName = image.substr(0, 100) + image.substr(image.length - 100);
+			const newImageName = image.substring(0, 100) + image.substring(image.length - 100);
 			fs.renameSync(imageName, `${mobileFolder}/${newImageName}`);
 			image = newImageName;
 			imageName = `${mobileFolder}/${newImageName}`;
+		}
+
+		if(knownDupes[utils.getFileNameWithoutExtension(image)]){
+			utils.logRed(`=> is known duplicate`);
+			foundDupes++;
+			return;
 		}
 
 		await sharp(imageName)
@@ -259,10 +280,16 @@ async function sortStuff() {
 		let imageName = `${wallpaperFolder}/${image}`;
 		if(image.length > 200) {
 			utils.logRed(`=> shortening long name`);
-			const newImageName = image.substr(0, 100) + image.substr(image.length - 100);
+			const newImageName = image.substring(0, 100) + image.substring(image.length - 100);
 			fs.renameSync(imageName, `${wallpaperFolder}/${newImageName}`);
 			image = newImageName;
 			imageName = `${wallpaperFolder}/${newImageName}`;
+		}
+
+		if(knownDupes[utils.getFileNameWithoutExtension(image)]){
+			utils.logRed(`=> is known duplicate`);
+			foundDupes++;
+			return;
 		}
 
 		await sharp(imageName)
@@ -294,15 +321,18 @@ async function sortStuff() {
 	  );
 		return;		
 	}));
+	utils.logBlue("------------------------------");
+	utils.logBlue(`Ignored ${foundDupes} duplicates`);
+	utils.logBlue("------------------------------");
 	return;
 }
 
 async function downscaleDesktop() {
-	upscaler.downscaleFolder(outputDownscale, outputFinal, 3840, 2160);
+	await upscaler.downscaleFolder(outputDownscale, outputFinal, 3840, 2160);
 }
 
 async function downscaleMobile() {
-	upscaler.downscaleFolder(outputMobileDownscale, outputMobile, 1080, 2400);
+	await upscaler.downscaleFolder(outputMobileDownscale, outputMobile, 1080, 2400);
 }
 
 async function cleanBeforeUpscale() {
@@ -329,10 +359,13 @@ async function cleanBeforeUpscale() {
 			continue;
 		}
 		const foundDupes = utils.deleteDuplicates(folder);
-		foundDupes.map((dupe) => {knownDupes[dupe] = true})
+		foundDupes.map((dupe) => {knownDupes[dupe] = true});
+		const foundDupes2 = utils.deleteSimilar(folder);
+		foundDupes2.map((dupe) => {knownDupes[dupe] = true});
 		console.log(`Finished cleaning ${index+1}/${folders.length}`);
-		fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 	}
+	
+	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 }
 
 async function cleanAfterUpscale() {
@@ -351,7 +384,9 @@ async function cleanAfterUpscale() {
 			continue;
 		}
 		const foundDupes = utils.deleteDuplicates(folder);
-		foundDupes.map((dupe) => {knownDupes[dupe] = true})
+		foundDupes.map((dupe) => {knownDupes[dupe] = true});
+		const foundDupes2 = utils.deleteSimilar(folder);
+		foundDupes2.map((dupe) => {knownDupes[dupe] = true});
 		console.log(`Finished cleaning ${index+1}/${folders.length}`);
 	}
 
