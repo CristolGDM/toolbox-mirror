@@ -177,6 +177,38 @@ async function upscalePSX(gameName) {
 	utils.deleteFolder(tempFolder);
 }
 
+async function upscalePS2(gameName) {
+	const folderLocation = "R:/PCSX2 1.7.0 dev";
+	const dumpFolder = `${folderLocation}/textures/${gameName}/dumps`;
+	const targetFolder = `${folderLocation}/textures/${gameName}/replacements`;
+	const tempFolder = `${folderLocation}/textures/${gameName}/temp`;
+
+	utils.createFolder(dumpFolder);
+	utils.createFolder(targetFolder);
+	utils.createFolder(tempFolder);
+
+	const images = fs.readdirSync(dumpFolder);
+	const existing = fs.readdirSync(targetFolder);
+
+	for (let i = 0; i < images.length; i++) {
+		const imageName = images[i];
+
+		// console.log(`${i+1} out of ${images.length}: ${imageName}`);
+		if(existing.indexOf(imageName) > -1) {
+			// console.log("=> Already exists, skipping");
+			continue;
+		}
+		
+		console.log(`${i+1} out of ${images.length}: ${imageName}`);
+
+		console.log("=> Moving to upscale folder");
+		fs.writeFileSync(path.join(tempFolder, imageName), fs.readFileSync(path.join(dumpFolder, imageName)));
+	}
+
+	upscaleFolderToOutput(tempFolder, targetFolder, models.lady, true);
+	utils.deleteFolder(tempFolder);
+}
+
 async function upscaleScreenshots() {
 	const screenshotFolder = "E:/Pictures/Screenshots";
 	const screenshotFolderTemp = "E:/Pictures/zzScreenshots temp";
@@ -242,6 +274,7 @@ exports.upscaleFolder = upscaleFolder;
 exports.upscaleFolderToOutput = upscaleFolderToOutput;
 exports.convertFolderToJpg = convertFolderToJpg;
 exports.upscalePSX = upscalePSX;
+exports.upscalePS2 = upscalePS2;
 exports.upscaleScreenshots = upscaleScreenshots;
 exports.downscaleFolder = downscaleFolder;
 
