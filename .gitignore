@@ -9,5 +9,5 @@ desktop.ini
 /csharp/DescriptionCleaning
 /homepage
 /node_modules
-/node/node_modules
-node/assets/other-subs.js
+/node-tools/node_modules
+node-tools/assets/other-subs.js
