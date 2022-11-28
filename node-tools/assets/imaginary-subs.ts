@@ -1,8 +1,9 @@
+import { bdfrSection } from "../scraper";
 import {NASPath} from "../utils";
 
 const PicturesPath = `${NASPath}/pictures`;
 
-export const subs = {
+export const subs: bdfrSection = {
 	colorscapes: {
 		subreddits: "ImaginaryColorscapes"
 	},

@@ -1,7 +1,8 @@
+import { bdfrSection } from "../scraper"
 import { NASPath } from "../utils"
 
 const jdrPath = `${NASPath}/books/tabletop-rpg`
-export const subs = {
+export const subs: bdfrSection = {
 	homebrew: {
 		folderPath: `${jdrPath}/DD5/Homebrew raw`,
 		subreddits: "UnearthedArcana"

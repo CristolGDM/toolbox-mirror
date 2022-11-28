@@ -6,7 +6,7 @@ import {subs as imaginarySubs} from "./assets/imaginary-subs";
 import {subs as otherSubs} from "./assets/other-subs";
 import {subs as dungeonSubs} from "./assets/dungeon-subs";
 
-const validTimeValues = {
+export const validTimeValues = {
 	all: "all" as const,
 	year: "year" as const,
 	month: "month" as const,
@@ -22,7 +22,7 @@ const nhDownloadFolder = "K:/_SPECIAL_/zzzDrawings";
 const nhUsedFolder = "K:/_SPECIAL_/Drawings";
 
 const forbiddenDomains = ["instagram.fbna1-2.fna.fbcdn.net", "instagram.fbna1-1.fna.fbcdn.net", "youtube.com", "youtu.be", "jp.spankbang.com", "xhamster.com", "xhamster49.com"];
-const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", "VedaDragon", "BeardyBennett", "CharmanterPanter", "Ikiera",
+export const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", "VedaDragon", "BeardyBennett", "CharmanterPanter", "Ikiera",
 "RedPersik", "TheGamedawg", "Meraugis", "NeoTheProtogen", "SnickerToodles", "UnpaidPigeon", "kazmatazzzz", "Jaybaybay2838", 
 "Lovable-Peril", "MagmaHotsguy", "Marmasghetti", "jaco147", "geergutz", "ClayEnchanter", "castass", "ZENRAMANIAC", "KronalgalVas",
 "B0B_22", "Taguel16", "Cab0san", "RowzeiChan", "Hollz23", "TripleA2006", "championsgamer1", "Reykurinn", "AgentB90",
@@ -30,7 +30,7 @@ const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", 
 "nbolen13", "Space_Fox586", "EwokTheGreatPrp", "EmeraldScales", "ClassicFrancois18", "pweavd", "smolb0i", "improy",
 "redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113", "VorgBardo", "technickr", "TheGeneral1899", "shinarit", "Trigger-red_cannibl"];
 
-function redditDownload(folderPath: string, subreddits: string, options: bdfrOptions) {
+export function redditDownload(folderPath: string, subreddits: string, options: bdfrOptions) {
 	const { time, limit, skipExisting, additionalArguments, openFolder} = options;
 	const usedTime = time && validTimeValues[time] ? validTimeValues[time] : validTimeValues.all;
 	utils.logYellow(`Downloading files from top of ${usedTime}`);
@@ -54,7 +54,7 @@ function redditDownload(folderPath: string, subreddits: string, options: bdfrOpt
 									${additional} --verbose`)
 }
 
-function sectionDownload(section, options) {
+function sectionDownload(section: bdfrSection, options: Pick<bdfrOptions, "limit">) {
 	const {limit} = options;
 	const categories = Object.keys(section);
 
@@ -70,25 +70,25 @@ function sectionDownload(section, options) {
 	}
 }
 
-function imaginaryDownload() {
+export function imaginaryDownload() {
 	sectionDownload(imaginarySubs, {limit: 200})
 };
 
-function otherDownload() {
+export function otherDownload() {
 	sectionDownload(otherSubs, {limit: 800});
 }
 
-function dungeonDownload() {
+export function dungeonDownload() {
 	sectionDownload(dungeonSubs, {limit: 50});
 }
 
-function redditCatchup(folderPath, subredditName, openFolder) {
+export function redditCatchup(folderPath: string, subredditName: string, openFolder: boolean) {
 	redditDownload(folderPath, subredditName, {time: validTimeValues.all, openFolder});
 	redditDownload(folderPath, subredditName, {time: validTimeValues.year, openFolder});
 	redditDownload(folderPath, subredditName, {time: validTimeValues.month, openFolder});
 }
 
-function generateArtPreviews() {
+export function generateArtPreviews() {
 	const folders = fs.readdirSync(nhUsedFolder);
 	folders.forEach((folder) => {
 		const files = fs.readdirSync(`${nhUsedFolder}/${folder}`);
@@ -113,12 +113,12 @@ function generateArtPreviews() {
 	});
 }
 
-function sortArt() {
+export function sortArt() {
 	const folders = fs.readdirSync(nhDownloadFolder);
 
 	folders.forEach(async (folder) => {
 		const downloadedFolder = path.join(nhDownloadFolder, folder);
-		const metadata = await JSON.parse(fs.readFileSync(`${downloadedFolder}/metadata.json`, "utf-8"));
+		const metadata: artMetadata = await JSON.parse(fs.readFileSync(`${downloadedFolder}/metadata.json`, "utf-8"));
 	
 		console.log(folder);
 		if(!metadata) {
@@ -139,9 +139,9 @@ function sortArt() {
 			parody = parody.split("|")[0].trim()
 		}
 	
-		let authors = !metadata.artist ? metadata.group ? metadata.group : ["Unknown"] : metadata.artist.length > 3 ? [metadata.artist[0],metadata.artist[1],metadata.artist[2], "etc"] : metadata.artist;
-		authors = authors.map(author => author.split("|")[0]).join(",");
-		authors = authors.charAt(0).toUpperCase() + authors.slice(1);
+		const authors = !metadata.artist ? metadata.group ? metadata.group : ["Unknown"] : metadata.artist.length > 3 ? [metadata.artist[0],metadata.artist[1],metadata.artist[2], "etc"] : metadata.artist;
+		let authorsFlat = authors.map(author => author.split("|")[0]).join(",");
+		authorsFlat = authorsFlat.charAt(0).toUpperCase() + authors.slice(1);
 	
 		const id = metadata.URL.split("/").pop();
 	
@@ -173,7 +173,7 @@ function sortArt() {
 	});
 }
 
-async function cleanUnwanted() {
+export async function cleanUnwanted() {
 	let found = 0;
 	let  folders = Object.keys(imaginarySubs).map(key => imaginarySubs[key].folderPath);
 	folders = folders.concat(Object.keys(otherSubs).map(key => otherSubs[key].folderPath));
@@ -240,7 +240,7 @@ async function cleanUnwanted() {
 // 	}
 // }
 
-function cleanOthers() {
+export function cleanOthers() {
 	let folders = [... new Set(Object.keys(otherSubs).map(key => otherSubs[key].folderPath))];
 
 	for (let index = 0; index < folders.length; index++) {
@@ -264,24 +264,6 @@ function test() {
 	return;
 }
 
-exports.validTimeValues = validTimeValues;
-exports.redditDownload = redditDownload;
-exports.redditCatchup = redditCatchup;
-
-exports.imaginaryDownload = imaginaryDownload;
-exports.otherDownload = otherDownload;
-exports.dungeonDownload = dungeonDownload;
-
-exports.generateArtPreviews = generateArtPreviews;
-exports.sortArt = sortArt;
-
-exports.forbiddenUsers = forbiddenUsers;
-exports.cleanUnwanted = cleanUnwanted;
-// exports.cleanImaginary = cleanImaginary;
-exports.cleanOthers = cleanOthers;
-
-exports.test = test;
-
 interface bdfrOptions {
 	time?: keyof typeof validTimeValues,
 	limit?: number,
@@ -289,3 +271,19 @@ interface bdfrOptions {
 	additionalArguments?: string,
 	openFolder?: boolean
 }
+
+interface artMetadata {
+	artist: string[],
+	group: string[],
+	parody: string[],
+	title: string,
+	URL: string
+}
+
+export interface bdfrSub {
+	subreddits: string,
+	folderPath?: string,
+	limit?: number
+}
+
+export type bdfrSection = { [key: string]: bdfrSub; }
