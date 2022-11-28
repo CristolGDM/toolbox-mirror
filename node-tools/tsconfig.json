@@ -5,7 +5,9 @@
       "removeComments": true,
       "preserveConstEnums": true,
       "target": "ESNext",
+      "outDir": "./compiled",
+      "allowJs": true
     },
-    "include": ["*.ts"],
-    "exclude": ["node_modules", "**/*.spec.ts"],
+    "include": ["*.*"],
+    "exclude": ["node_modules", "compiled/**/*"],
   }
