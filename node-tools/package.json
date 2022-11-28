@@ -2,11 +2,14 @@
   "name": "basic",
   "version": "1.0.0",
   "description": "meh",
-  "main": "text.js",
+  "main": "req_all",
+  "typings": "req_all",
   "dependencies": {
     "async-ffmetadata": "^0.1.9",
     "axios": "^0.21.1",
     "jsdom": "^16.6.0",
+    "path": "^0.12.7",
+    "sharp": "^0.31.2",
     "typescript": "^4.9.3",
     "url-exist": "^3.0.0"
   },
@@ -14,6 +17,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Cristol",
   "license": "ISC"
 }

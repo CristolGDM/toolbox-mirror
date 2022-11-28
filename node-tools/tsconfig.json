@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "module": "CommonJS",
+      "noImplicitAny": false,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "target": "ESNext",
+    },
+    "include": ["*.ts"],
+    "exclude": ["node_modules", "**/*.spec.ts"],
+  }
