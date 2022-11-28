@@ -149,7 +149,8 @@ const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", 
 "nbolen13", "Space_Fox586", "EwokTheGreatPrp", "EmeraldScales", "ClassicFrancois18", "pweavd", "smolb0i", "improy",
 "redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113", "VorgBardo", "technickr", "TheGeneral1899", "shinarit", "Trigger-red_cannibl"];
 
-function redditDownload(folderPath, subreddits, time, limit, skipExisting, additionalArguments) {
+function redditDownload(folderPath, subreddits, options) {
+	const { time, limit, skipExisting, additionalArguments} = options;
 	const usedTime = time && validTimeValues[time] ? validTimeValues[time] : validTimeValues.all;
 	utils.logYellow(`Downloading files from top of ${usedTime}`);
 	const usedLimit = limit ? limit : 1000;
@@ -170,7 +171,8 @@ function redditDownload(folderPath, subreddits, time, limit, skipExisting, addit
 									${additional} --verbose`)
 }
 
-function sectionDownload(subs, limit) {
+function sectionDownload(subs, options) {
+	const {limit} = options;
 	const categories = Object.keys(subs);
 
 	for (let i = 0; i < categories.length; i++) {
@@ -181,26 +183,26 @@ function sectionDownload(subs, limit) {
 		utils.logBlue(`Downloading ${category}, folder ${i+1}/${categories.length}`);
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, validTimeValues.month, details.limit ? details.limit : limit, false)
+		redditDownload(details.folderPath, details.subreddits, {time: validTimeValues.month, limit: details.limit ? details.limit : limit, skipExisting: false})
 	}
 }
 
 function imaginaryDownload() {
-	sectionDownload(imaginarySubs, 200)
+	sectionDownload(imaginarySubs, {limit: 200})
 };
 
 function bootyDownload() {
-	sectionDownload(bootySubs, 800);
+	sectionDownload(bootySubs, {limit: 800});
 }
 
 function dungeonDownload() {
-	sectionDownload(dungeonSubs, 50);
+	sectionDownload(dungeonSubs, {limit: 50});
 }
 
 function redditCatchup(folderPath, subredditName) {
-	redditDownload(folderPath, subredditName, validTimeValues.all);
-	redditDownload(folderPath, subredditName, validTimeValues.year);
-	redditDownload(folderPath, subredditName, validTimeValues.month);
+	redditDownload(folderPath, subredditName, {time: validTimeValues.all});
+	redditDownload(folderPath, subredditName, {time: validTimeValues.year});
+	redditDownload(folderPath, subredditName, {time: validTimeValues.month});
 }
 
 function generateArtPreviews() {
