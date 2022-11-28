@@ -1,6 +1,9 @@
 const utils = require ("./utils.js");
 const path = require("path");
 const fs = require("fs");
+import {subs as imaginarySubs} from "./assets/imaginary-subs";
+import {subs as otherSubs} from "./assets/other-subs";
+import {subs as dungeonSubs} from "./assets/dungeon-subs";
 
 const validTimeValues = {
 	all: "all",
@@ -10,445 +13,9 @@ const validTimeValues = {
 	day: "day"
 }
 
-const NASPath = "//MOOMINLIBRARY";
+const NASPath = utils.NASPath;
 const PicturesPath = `${NASPath}/pictures`;
 const ImaginaryNetworkPath = `${PicturesPath}/imaginary-network/`;
-
-const imaginarySubs = {
-	colorscapes: {
-		subreddits: "ImaginaryColorscapes"
-	},
-	moescape: {
-		subreddits: "Moescape"
-	},
-	"slice-of-life": {
-		subreddits: "ImaginarySliceOfLife"
-	},
-	//
-	archers: {
-		subreddits: "ImaginaryArchers"
-	},
-	"armored-women": {
-		subreddits: "armoredwomen"
-	},
-	artists: {
-		subreddits: "ImaginaryArtists"
-	},
-	"asian-characters": {
-		subreddits: "ImaginAsian"
-	},
-	assassins: {
-		subreddits: "ImaginaryAssassins"
-	},
-	bards: {
-		subreddits: "imaginarybards"
-	},
-	characters: {
-		subreddits: "ImaginaryCharacters, characterdrawing"
-	},
-	clerics: {
-		subreddits: "ImaginaryClerics"
-	},
-	dwarves: {
-		subreddits: "ImaginaryDwarves"
-	},
-	elves: {
-		subreddits: "ImaginaryElves"
-	},
-	gnomes: {
-		subreddits: "ImaginaryGnomes"
-	},
-	humans: {
-		subreddits: "ImaginaryHumans"
-	},
-	knights: {
-		subreddits: "ImaginaryKnights"
-	},
-	merchants: {
-		subreddits: "ImaginaryMerchants"
-	},
-	natives: {
-		subreddits: "ImaginaryNatives"
-	},
-	ninjas: {
-		subreddits: "ImaginaryNinjas"
-	},
-	nobles: {
-		subreddits: "ImaginaryNobles"
-	},
-	orcs: {
-		subreddits: "ImaginaryOrcs"
-	},
-	"realist-fantasy": {
-		subreddits: "ReasonableFantasy"
-	},
-	samurai: {
-		subreddits: "ImaginarySamurai"
-	},
-	scholars: {
-		subreddits: "ImaginaryScholars"
-	},
-	soldiers: {
-		subreddits: "ImaginarySoldiers"
-	},
-	vikings: {
-		subreddits: "ImaginaryVikings"
-	},
-	warriors: {
-		subreddits: "ImaginaryWarriors"
-	},
-	witches: {
-		subreddits: "ImaginaryWitches"
-	},
-	wizards: {
-		subreddits: "ImaginaryWizards"
-	},
-	
-	//
-
-	aetherpunk: {
-		subreddits: "ImaginaryAetherpunk"
-	},
-	armor: {
-		subreddits: "ImaginaryArmor"
-	},
-	weapons: {
-		subreddits: "ImaginaryWeaponry"
-	},
-
-	//
-
-	mounts: {
-		subreddits: "EpicMounts"
-	},
-	
-	//
-
-	"animals-cute": {
-		subreddits: "ImaginaryAww"
-	},
-	"animals-pets": {
-		subreddits: "imaginarypets"
-	},
-   
-   //
-
-	airships: {
-		subreddits: "ImaginaryAirships"
-	},
-	planes: {
-		subreddits: "ImaginaryAviation"
-	},
-	vehicles: {
-		subreddits: "ImaginaryVehicles"
-	},
-	boats: {
-		subreddits: "Imaginaryvessels"
-	},
-	warships: {
-		subreddits: "ImaginaryWarships"
-	},
-
-   //
-
-	pokemon: {
-		subreddits: "ImaginaryKanto"
-	},
-	"magic-the-gathering": {
-		subreddits: "mtgporn"
-	},
-   
-   //
-
-	"celestial-beings": {
-		subreddits: "CelestialBodies"
-	},
-	angels: {
-		subreddits: "ImaginaryAngels"
-	},
-	centaurs: {
-		subreddits: "ImaginaryCentaurs"
-	},
-	demons: {
-		subreddits: "ImaginaryDemons"
-	},
-	fairies: {
-		subreddits: "ImaginaryFaeries"
-	},
-	giants: {
-		subreddits: "ImaginaryGiants"
-	},
-	goblins: {
-		subreddits: "ImaginaryGoblins"
-	},
-	"immortal-beings": {
-		subreddits: "ImaginaryImmortals"
-	},
-	merfolks: {
-		subreddits: "ImaginaryMerfolk"
-	},
-	"monster-girls": {
-		subreddits: "ImaginaryMonsterGirls"
-	},
-	vampires: {
-		subreddits: "ImaginaryVampires"
-	},
-	werewolves: {
-		subreddits: "ImaginaryWerewolves"
-	},
-
-   //
-
-   dragons: {
-		subreddits: "BadAssDragons, ImaginaryDragons"
-	},
-	beasts: {
-		subreddits: "ImaginaryBeasts"
-	},
-	behemoths: {
-		subreddits: "ImaginaryBehemoths"
-	},
-	dinosaurs: {
-		subreddits: "ImaginaryDinosaurs"
-	},
-	elementals: {
-		subreddits: "ImaginaryElementals"
-	},
-	horrors: {
-		subreddits: "ImaginaryHorrors"
-	},
-	"animals-hybrids": {
-		subreddits: "ImaginaryHybrids"
-	},
-	"sea-monsters": {
-		subreddits: "ImaginaryLeviathans"
-	},
-	monsters: {
-		subreddits: "ImaginaryMonsters"
-	},
-	spirits: {
-		subreddits: "ImaginarySpirits"
-	},
-	trolls: {
-		subreddits: "ImaginaryTrolls"
-	},
-	undead: {
-		subreddits: "ImaginaryUndead"
-	},
-	"world-eaters": {
-		subreddits: "ImaginaryWorldEaters"
-	},
-   
-   //
-
-	cities: {
-		subreddits: "ImaginaryCityscapes"
-	},
-	hellscapes: {
-		subreddits: "ImaginaryHellscapes"
-	},
-	pathways: {
-		subreddits: "ImaginaryPathways"
-	},
-	portals: {
-		subreddits: "ImaginaryPortals"
-	},
-	villages: {
-		subreddits: "ImaginaryVillages"
-	},
-	walls: {
-		subreddits: "ImaginaryWalls"
-	},
-	wastelands: {
-		subreddits: "ImaginaryWastelands"
-	},
-	"imaginary-worlds": {
-		subreddits: "ImaginaryWorlds"
-	},
-   
-   //
-   
-	"autumn-scenery": {
-		subreddits: "ImaginaryAutumnscapes"
-	},
-	canyons: {
-		subreddits: "ImaginaryCanyons"
-	},
-	caves: {
-		subreddits: "ImaginaryCaves"
-	},
-	deserts: {
-		subreddits: "ImaginaryDeserts"
-	},
-	forests: {
-		subreddits: "ImaginaryForests, ImaginaryTrees"
-	},
-	islands: {
-		subreddits: "ImaginaryIslands"
-	},
-	jungles: {
-		subreddits: "ImaginaryJungles"
-	},
-	lakes: {
-		subreddits: "ImaginaryLakes"
-	},
-	mountains: {
-		subreddits: "ImaginaryMountains"
-	},
-	"sea-scenery": {
-		subreddits: "ImaginarySeascapes"
-	},
-	"sky-scenery": {
-		subreddits: "ImaginarySkyscapes"
-	},
-	swamps: {
-		subreddits: "ImaginarySwamps"
-	},
-	volcanoes: {
-		subreddits: "ImaginaryVolcanoes"
-	},
-	waterfalls: {
-		subreddits: "ImaginaryWaterfalls"
-	},
-	wildlands: {
-		subreddits: "ImaginaryWildlands"
-	},
-	"winter-scenery": {
-		subreddits: "ImaginaryWinterscapes"
-	},
-
-   //
-   
-	battlefields: {
-		subreddits: "ImaginaryBattlefields"
-	},
-	"scenes-with-feels": {
-		subreddits: "ImaginaryFeels"
-	},
-	gatherings: {
-		subreddits: "ImaginaryGatherings"
-	},
-	weather: {
-		subreddits: "ImaginaryWeather"
-	},
-
-   //
-
-	architecture: {
-		subreddits: "ImaginaryArchitecture"
-	},
-	castles: {
-		subreddits: "ImaginaryCastles"
-	},
-	dwellings: {
-		subreddits: "ImaginaryDwellings"
-	},
-	factories: {
-		subreddits: "ImaginaryFactories"
-	},
-	interiors: {
-		subreddits: "ImaginaryInteriors"
-	},
-	libraries: {
-		subreddits: "ImaginaryLibraries"
-	},
-	monuments: {
-		subreddits: "ImaginaryMonuments"
-	},
-	prisons: {
-		subreddits: "ImaginaryPrisons"
-	},
-	ruins: {
-		subreddits: "ImaginaryRuins"
-	},
-	taverns: {
-		subreddits: "ImaginaryTaverns"
-	},
-	temples: {
-		subreddits: "ImaginaryTemples"
-	},
-	towers: {
-		subreddits: "ImaginaryTowers"
-	},
-
-   //
-
-	scifi: {
-		subreddits: "futureporn, ImaginaryFutureWar, ImaginaryFuturism"
-	},
-	cyberpunk: {
-		subreddits: "ImaginaryCyberpunk"
-	},
-	mechas: {
-		subreddits: "ImaginaryMechs"
-	},
-	robots: {
-		subreddits: "ImaginaryRobotics"
-	},
-	astronauts: {
-		subreddits: "ImaginaryAstronauts"
-	},
-	cybernetics: {
-		subreddits: "ImaginaryCybernetics"
-	},
-	starscapes: {
-		subreddits: "ImaginaryAliens"
-	},
-	"super-structures": {
-		subreddits: "ImaginaryAliens"
-	},
-	starships: {
-		subreddits: "ImaginaryStarships, StarshipPorn"
-	},
-   
-   //
-
-	isometric: {
-		subreddits: "isometric"
-	},
-
-   //
-   
-	wallpapers: {
-		folderPath: `${PicturesPath}/wallpapers`, 
-		subreddits: "wallpapers, WQHD_Wallpaper" 
-	},
-	wallpapers_mobile: {
-		folderPath: `${PicturesPath}/wallpapers-mobile`, 
-		subreddits: "AnimePhoneWallpapers, MobileWallpaper, Verticalwallpapers" 
-	},
-};
-
-const bootySubs = {
-	east: {
-		folderPath: 'K:\\_SPECIAL_\\East',
-		subreddits: "Ai_Shinozaki, AikaYumeno, Aimi_Yoshikawa, asian_gifs, asianandlovingit, AsianCuties, AsianHotties, AsianNSFW, AsianPorn, AsianPornIn1Minute, AsiansGoneWild, bustyasians, FansOfRaMu, HanaHarunaJAV, JapanesePorn2, juicyasians, JuliaJAV, junamaki, KahoShibuya, KureaHasumi, NSFW_Japan, RenaMomozono, RioHamasaki, SakiYanase, SakuraKirishima, ShionUtsunomiya, shioritsukada, TeramotoRio, YukiJin, YuShinoda" 
-	},
-	end: {
-		folderPath: 'K:\\_SPECIAL_\\End',
-		subreddits: "O_Faces, Orgasms, pronebone, quiver, whenitgoesin" 
-	},
-	reveal: {
-		folderPath: 'K:\\_SPECIAL_\\Reveal',
-		subreddits: "BigBoobsGonewild, BiggerThanYouThought, boobbounce, BustyNaturals, BustyPetite, cleavage, cosplayonoff, gonewild, GWBusty, OnOff, onoffcollages, TittyDrop, Underskirts, Upskirt" ,
-	}
-}
-
-const jdrPath = `${NASPath}/books/tabletop-rpg`
-const dungeonSubs = {
-	homebrew: {
-		folderPath: `${jdrPath}/DD5/Homebrew raw`,
-		subreddits: "UnearthedArcana"
-	},
-	mapmaking: {
-		folderPath: `${jdrPath}/_maps`,
-		subreddits: "mapmaking"
-	},
-	battlemaps: {
-		folderPath: `${jdrPath}/_battlemaps`,
-		subreddits: "battlemaps"
-	}
-}
 
 const nhDownloadFolder = "K:/_SPECIAL_/zzzDrawings";
 const nhUsedFolder = "K:/_SPECIAL_/Drawings";
@@ -506,8 +73,8 @@ function imaginaryDownload() {
 	sectionDownload(imaginarySubs, {limit: 200})
 };
 
-function bootyDownload() {
-	sectionDownload(bootySubs, {limit: 800});
+function otherDownload() {
+	sectionDownload(otherSubs, {limit: 800});
 }
 
 function dungeonDownload() {
@@ -608,7 +175,7 @@ function sortArt() {
 async function cleanUnwanted() {
 	let found = 0;
 	let  folders = Object.keys(imaginarySubs).map(key => imaginarySubs[key].folderPath);
-	folders = folders.concat(Object.keys(bootySubs).map(key => bootySubs[key].folderPath));
+	folders = folders.concat(Object.keys(otherSubs).map(key => otherSubs[key].folderPath));
 	folders = folders.concat(Object.keys(dungeonSubs).map(key => dungeonSubs[key].folderPath));
 	folders.push("E:\\Pictures\\zzzWallpapers temp");
 	folders.push("E:\\Pictures\\zzzWallpapers temp-toscale");
@@ -672,8 +239,8 @@ async function cleanUnwanted() {
 // 	}
 // }
 
-function cleanBooty() {
-	let folders = [... new Set(Object.keys(bootySubs).map(key => bootySubs[key].folderPath))];
+function cleanOthers() {
+	let folders = [... new Set(Object.keys(otherSubs).map(key => otherSubs[key].folderPath))];
 
 	for (let index = 0; index < folders.length; index++) {
 		const folder = folders[index].replace(/\\/g, "/");
@@ -700,12 +267,8 @@ exports.validTimeValues = validTimeValues;
 exports.redditDownload = redditDownload;
 exports.redditCatchup = redditCatchup;
 
-exports.imaginarySubs = imaginarySubs;
-exports.bootySubs = bootySubs;
-exports.dungeonSubs = dungeonSubs;
-
 exports.imaginaryDownload = imaginaryDownload;
-exports.bootyDownload = bootyDownload;
+exports.otherDownload = otherDownload;
 exports.dungeonDownload = dungeonDownload;
 
 exports.generateArtPreviews = generateArtPreviews;
@@ -714,6 +277,6 @@ exports.sortArt = sortArt;
 exports.forbiddenUsers = forbiddenUsers;
 exports.cleanUnwanted = cleanUnwanted;
 // exports.cleanImaginary = cleanImaginary;
-exports.cleanBooty = cleanBooty;
+exports.cleanOthers = cleanOthers;
 
 exports.test = test;

@@ -4,6 +4,7 @@ path = require("path");
 const { execSync, exec } = require('child_process');
 
 const separatorBase = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
+const NASPath = "//MOOMINLIBRARY";
 
 function getFileNameWithoutExtension(fileName) {
 	const nameSplit = fileName.split(".");
@@ -216,3 +217,4 @@ exports.redString = redString;
 exports.yellowString = yellowString;
 exports.blueString = blueString;
 exports.greenString = greenString;
+exports.NASPath = NASPath;
