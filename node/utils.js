@@ -1,7 +1,7 @@
 fs = require("fs");
 sharp = require("sharp");
 path = require("path");
-const { execSync } = require('child_process');
+const { execSync, exec } = require('child_process');
 
 const separatorBase = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
 
@@ -171,17 +171,20 @@ function yellowString(string) {
 	return `\x1b[93m${string}\x1b[0m`
 }
 
-function execShell(command) {
+function execShell(command, isAsync) {
 	logLine();
 	logYellow(" " + separator(30));
 	logLine();
 	logYellow(" executing following command:")
 	logLine();
-	logBlue(" " + command);
+	logBlue("" + command);
 	logLine();
 	logYellow(" " + separator(30));
 	logLine();
 
+	isAsync ?
+	exec(command, {stdio:[0,1,2]})
+	:
 	execSync(command, {stdio:[0,1,2]});
 }
 

@@ -150,7 +150,7 @@ const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_Echo", 
 "redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113", "VorgBardo", "technickr", "TheGeneral1899", "shinarit", "Trigger-red_cannibl"];
 
 function redditDownload(folderPath, subreddits, options) {
-	const { time, limit, skipExisting, additionalArguments} = options;
+	const { time, limit, skipExisting, additionalArguments, openFolder} = options;
 	const usedTime = time && validTimeValues[time] ? validTimeValues[time] : validTimeValues.all;
 	utils.logYellow(`Downloading files from top of ${usedTime}`);
 	const usedLimit = limit ? limit : 1000;
@@ -159,14 +159,16 @@ function redditDownload(folderPath, subreddits, options) {
 	const skippedUsers = forbiddenUsers.map(user => `--ignore-user "${user}"`).join(" ");
 	const skipExistingParam = skipExisting ? "--search-existing" : "";
 
-	const logPath = folderPath.split("\\");
-	logPath.pop();
-	logPath.push("bdfr_logs");
+	console.log(path.join(path.dirname(folderPath), "bdfr_logs"));
+	const logPath = path.join(path.dirname(folderPath), "bdfr_logs");
+	if(openFolder) {
+		utils.execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${folderPath}"`, true)
+	}
 	utils.execShell(`py -m bdfr download "${folderPath}" \
 									--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} \
 									--folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" \
 									${skippedDomains}	${skippedUsers} \
-									--log "${logPath.join("\\")}" \
+									--log "${logPath}" \
 									--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" \
 									${additional} --verbose`)
 }
@@ -199,10 +201,10 @@ function dungeonDownload() {
 	sectionDownload(dungeonSubs, {limit: 50});
 }
 
-function redditCatchup(folderPath, subredditName) {
-	redditDownload(folderPath, subredditName, {time: validTimeValues.all});
-	redditDownload(folderPath, subredditName, {time: validTimeValues.year});
-	redditDownload(folderPath, subredditName, {time: validTimeValues.month});
+function redditCatchup(folderPath, subredditName, openFolder) {
+	redditDownload(folderPath, subredditName, {time: validTimeValues.all, openFolder});
+	redditDownload(folderPath, subredditName, {time: validTimeValues.year, openFolder});
+	redditDownload(folderPath, subredditName, {time: validTimeValues.month, openFolder});
 }
 
 function generateArtPreviews() {
