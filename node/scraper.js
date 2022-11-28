@@ -10,95 +10,411 @@ const validTimeValues = {
 	day: "day"
 }
 
+const NASPath = "//MOOMINLIBRARY";
+const PicturesPath = `${NASPath}/pictures`;
+const ImaginaryNetworkPath = `${PicturesPath}/imaginary-network/`;
+
 const imaginarySubs = {
-	chill: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Chill', 
-		subreddits: "ImaginaryColorscapes, ImaginaryInteriors, ImaginarySliceOfLife, Moescape"
+	colorscapes: {
+		subreddits: "ImaginaryColorscapes"
+	},
+	moescape: {
+		subreddits: "Moescape"
+	},
+	"slice-of-life": {
+		subreddits: "ImaginarySliceOfLife"
+	},
+	//
+	archers: {
+		subreddits: "ImaginaryArchers"
+	},
+	"armored-women": {
+		subreddits: "armoredwomen"
+	},
+	artists: {
+		subreddits: "ImaginaryArtists"
+	},
+	"asian-characters": {
+		subreddits: "ImaginAsian"
+	},
+	assassins: {
+		subreddits: "ImaginaryAssassins"
+	},
+	bards: {
+		subreddits: "imaginarybards"
 	},
 	characters: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Characters', 
-		subreddits: "armoredwomen, ImaginaryArchers, ImaginaryArtists, ImaginaryAssassins, imaginarybards, ImaginaryCharacters, ImaginaryClerics, ImaginaryDwarves, ImaginaryElves, ImaginaryGnomes, ImaginaryHumans, ImaginaryKnights, ImaginaryMerchants, ImaginaryNatives, ImaginaryNinjas, ImaginaryNobles, ImaginaryOrcs, ImaginarySamurai, ImaginaryScholars, ImaginarySoldiers, ImaginaryVikings, ImaginaryWarriors, ImaginaryWitches, ImaginaryWizards, ImaginAsian, ReasonableFantasy"
+		subreddits: "ImaginaryCharacters, characterdrawing"
 	},
-	items: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Items', 
-		subreddits: "ImaginaryAetherpunk, ImaginaryArmor, ImaginaryWeaponry" 
+	clerics: {
+		subreddits: "ImaginaryClerics"
 	},
+	dwarves: {
+		subreddits: "ImaginaryDwarves"
+	},
+	elves: {
+		subreddits: "ImaginaryElves"
+	},
+	gnomes: {
+		subreddits: "ImaginaryGnomes"
+	},
+	humans: {
+		subreddits: "ImaginaryHumans"
+	},
+	knights: {
+		subreddits: "ImaginaryKnights"
+	},
+	merchants: {
+		subreddits: "ImaginaryMerchants"
+	},
+	natives: {
+		subreddits: "ImaginaryNatives"
+	},
+	ninjas: {
+		subreddits: "ImaginaryNinjas"
+	},
+	nobles: {
+		subreddits: "ImaginaryNobles"
+	},
+	orcs: {
+		subreddits: "ImaginaryOrcs"
+	},
+	"realist-fantasy": {
+		subreddits: "ReasonableFantasy"
+	},
+	samurai: {
+		subreddits: "ImaginarySamurai"
+	},
+	scholars: {
+		subreddits: "ImaginaryScholars"
+	},
+	soldiers: {
+		subreddits: "ImaginarySoldiers"
+	},
+	vikings: {
+		subreddits: "ImaginaryVikings"
+	},
+	warriors: {
+		subreddits: "ImaginaryWarriors"
+	},
+	witches: {
+		subreddits: "ImaginaryWitches"
+	},
+	wizards: {
+		subreddits: "ImaginaryWizards"
+	},
+	
+	//
+
+	aetherpunk: {
+		subreddits: "ImaginaryAetherpunk"
+	},
+	armor: {
+		subreddits: "ImaginaryArmor"
+	},
+	weapons: {
+		subreddits: "ImaginaryWeaponry"
+	},
+
+	//
+
 	mounts: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Mounts', 
 		subreddits: "EpicMounts"
 	},
-	pets: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Pets', 
-		subreddits: "ImaginaryAww, imaginarypets",
-		limit: 50
+	
+	//
+
+	"animals-cute": {
+		subreddits: "ImaginaryAww"
+	},
+	"animals-pets": {
+		subreddits: "imaginarypets"
+	},
+   
+   //
+
+	airships: {
+		subreddits: "ImaginaryAirships"
+	},
+	planes: {
+		subreddits: "ImaginaryAviation"
 	},
 	vehicles: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Vehicles', 
-		subreddits: "ImaginaryAirships, ImaginaryAviation, ImaginaryStarships, ImaginaryVehicles, Imaginaryvessels, ImaginaryWarships" 
+		subreddits: "ImaginaryVehicles"
 	},
+	boats: {
+		subreddits: "Imaginaryvessels"
+	},
+	warships: {
+		subreddits: "ImaginaryWarships"
+	},
+
+   //
+
 	pokemon: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Pokemon', 
 		subreddits: "ImaginaryKanto"
 	},
-	monster_characters: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Monster characters', 
-		subreddits: "CelestialBodies, ImaginaryAngels, ImaginaryCentaurs, ImaginaryDemons, ImaginaryFaeries, ImaginaryGiants, ImaginaryGoblins, ImaginaryImmortals, ImaginaryMerfolk, ImaginaryMonsterGirls, ImaginaryVampires, ImaginaryWerewolves" 
+	"magic-the-gathering": {
+		subreddits: "mtgporn"
+	},
+   
+   //
+
+	"celestial-beings": {
+		subreddits: "CelestialBodies"
+	},
+	angels: {
+		subreddits: "ImaginaryAngels"
+	},
+	centaurs: {
+		subreddits: "ImaginaryCentaurs"
+	},
+	demons: {
+		subreddits: "ImaginaryDemons"
+	},
+	fairies: {
+		subreddits: "ImaginaryFaeries"
+	},
+	giants: {
+		subreddits: "ImaginaryGiants"
+	},
+	goblins: {
+		subreddits: "ImaginaryGoblins"
+	},
+	"immortal-beings": {
+		subreddits: "ImaginaryImmortals"
+	},
+	merfolks: {
+		subreddits: "ImaginaryMerfolk"
+	},
+	"monster-girls": {
+		subreddits: "ImaginaryMonsterGirls"
+	},
+	vampires: {
+		subreddits: "ImaginaryVampires"
+	},
+	werewolves: {
+		subreddits: "ImaginaryWerewolves"
+	},
+
+   //
+
+   dragons: {
+		subreddits: "BadAssDragons, ImaginaryDragons"
+	},
+	beasts: {
+		subreddits: "ImaginaryBeasts"
+	},
+	behemoths: {
+		subreddits: "ImaginaryBehemoths"
+	},
+	dinosaurs: {
+		subreddits: "ImaginaryDinosaurs"
+	},
+	elementals: {
+		subreddits: "ImaginaryElementals"
+	},
+	horrors: {
+		subreddits: "ImaginaryHorrors"
+	},
+	"animals-hybrids": {
+		subreddits: "ImaginaryHybrids"
+	},
+	"sea-monsters": {
+		subreddits: "ImaginaryLeviathans"
 	},
 	monsters: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Monsters', 
-		subreddits: "BadAssDragons, ImaginaryBeasts, ImaginaryBehemoths, ImaginaryDinosaurs, ImaginaryElementals, ImaginaryHorrors, ImaginaryHybrids, ImaginaryLeviathans, ImaginaryMonsters, ImaginarySpirits, ImaginaryTrolls, ImaginaryUndead, ImaginaryWorldEaters"
+		subreddits: "ImaginaryMonsters"
 	},
-	dragons: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Monsters', 
-		subreddits: "ImaginaryDragons",
-		limit: 150
+	spirits: {
+		subreddits: "ImaginarySpirits"
 	},
-	places: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Places', 
-		subreddits: "ImaginaryCityscapes, ImaginaryHellscapes, ImaginaryPathways, ImaginaryPortals, ImaginaryVillages, ImaginaryWalls, ImaginaryWastelands, ImaginaryWorlds" 
+	trolls: {
+		subreddits: "ImaginaryTrolls"
 	},
-	nature: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Nature', 
-		subreddits: "ImaginaryAutumnscapes, ImaginaryCanyons, ImaginaryCaves, ImaginaryDeserts, ImaginaryForests, ImaginaryIslands, ImaginaryJungles, ImaginaryLakes, ImaginaryMountains, ImaginaryRivers, ImaginarySeascapes, ImaginarySkyscapes, ImaginarySwamps, ImaginaryTrees, ImaginaryVolcanoes, ImaginaryWaterfalls, ImaginaryWildlands, ImaginaryWinterscapes" 
+	undead: {
+		subreddits: "ImaginaryUndead"
 	},
-	scenes: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scenes', 
-		subreddits: "ImaginaryBattlefields, ImaginaryFeels, ImaginaryGatherings, ImaginarySliceOfLife, ImaginaryWeather" 
+	"world-eaters": {
+		subreddits: "ImaginaryWorldEaters"
 	},
-	buildings: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Buildings', 
-		subreddits: "ImaginaryArchitecture, ImaginaryCastles, ImaginaryDwellings, ImaginaryFactories, ImaginaryInteriors, ImaginaryLibraries, ImaginaryMonuments, ImaginaryPrisons, ImaginaryRuins, ImaginaryTaverns, ImaginaryTemples, ImaginaryTowers" 
+   
+   //
+
+	cities: {
+		subreddits: "ImaginaryCityscapes"
 	},
+	hellscapes: {
+		subreddits: "ImaginaryHellscapes"
+	},
+	pathways: {
+		subreddits: "ImaginaryPathways"
+	},
+	portals: {
+		subreddits: "ImaginaryPortals"
+	},
+	villages: {
+		subreddits: "ImaginaryVillages"
+	},
+	walls: {
+		subreddits: "ImaginaryWalls"
+	},
+	wastelands: {
+		subreddits: "ImaginaryWastelands"
+	},
+	"imaginary-worlds": {
+		subreddits: "ImaginaryWorlds"
+	},
+   
+   //
+   
+	"autumn-scenery": {
+		subreddits: "ImaginaryAutumnscapes"
+	},
+	canyons: {
+		subreddits: "ImaginaryCanyons"
+	},
+	caves: {
+		subreddits: "ImaginaryCaves"
+	},
+	deserts: {
+		subreddits: "ImaginaryDeserts"
+	},
+	forests: {
+		subreddits: "ImaginaryForests, ImaginaryTrees"
+	},
+	islands: {
+		subreddits: "ImaginaryIslands"
+	},
+	jungles: {
+		subreddits: "ImaginaryJungles"
+	},
+	lakes: {
+		subreddits: "ImaginaryLakes"
+	},
+	mountains: {
+		subreddits: "ImaginaryMountains"
+	},
+	"sea-scenery": {
+		subreddits: "ImaginarySeascapes"
+	},
+	"sky-scenery": {
+		subreddits: "ImaginarySkyscapes"
+	},
+	swamps: {
+		subreddits: "ImaginarySwamps"
+	},
+	volcanoes: {
+		subreddits: "ImaginaryVolcanoes"
+	},
+	waterfalls: {
+		subreddits: "ImaginaryWaterfalls"
+	},
+	wildlands: {
+		subreddits: "ImaginaryWildlands"
+	},
+	"winter-scenery": {
+		subreddits: "ImaginaryWinterscapes"
+	},
+
+   //
+   
+	battlefields: {
+		subreddits: "ImaginaryBattlefields"
+	},
+	"scenes-with-feels": {
+		subreddits: "ImaginaryFeels"
+	},
+	gatherings: {
+		subreddits: "ImaginaryGatherings"
+	},
+	weather: {
+		subreddits: "ImaginaryWeather"
+	},
+
+   //
+
+	architecture: {
+		subreddits: "ImaginaryArchitecture"
+	},
+	castles: {
+		subreddits: "ImaginaryCastles"
+	},
+	dwellings: {
+		subreddits: "ImaginaryDwellings"
+	},
+	factories: {
+		subreddits: "ImaginaryFactories"
+	},
+	interiors: {
+		subreddits: "ImaginaryInteriors"
+	},
+	libraries: {
+		subreddits: "ImaginaryLibraries"
+	},
+	monuments: {
+		subreddits: "ImaginaryMonuments"
+	},
+	prisons: {
+		subreddits: "ImaginaryPrisons"
+	},
+	ruins: {
+		subreddits: "ImaginaryRuins"
+	},
+	taverns: {
+		subreddits: "ImaginaryTaverns"
+	},
+	temples: {
+		subreddits: "ImaginaryTemples"
+	},
+	towers: {
+		subreddits: "ImaginaryTowers"
+	},
+
+   //
+
 	scifi: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi', 
-		subreddits: "futureporn, ImaginaryCyberpunk, ImaginaryFutureWar, ImaginaryFuturism, ImaginaryMechs, ImaginaryRobotics" 
+		subreddits: "futureporn, ImaginaryFutureWar, ImaginaryFuturism"
 	},
-	scifiCharacters: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Characters', 
-		subreddits: "ImaginaryAstronauts, ImaginaryCybernetics"
+	cyberpunk: {
+		subreddits: "ImaginaryCyberpunk"
 	},
-	aliens: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Aliens', 
+	mechas: {
+		subreddits: "ImaginaryMechs"
+	},
+	robots: {
+		subreddits: "ImaginaryRobotics"
+	},
+	astronauts: {
+		subreddits: "ImaginaryAstronauts"
+	},
+	cybernetics: {
+		subreddits: "ImaginaryCybernetics"
+	},
+	starscapes: {
 		subreddits: "ImaginaryAliens"
 	},
-	scifiPlaces: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Places', 
-		subreddits: "ImaginaryStarscapes, SuperStructures"
+	"super-structures": {
+		subreddits: "ImaginaryAliens"
 	},
 	starships: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Scifi-Starships', 
 		subreddits: "ImaginaryStarships, StarshipPorn"
 	},
+   
+   //
+
 	isometric: {
-		folderPath: 'E:\\Pictures\\Imaginary Network\\Isometric', 
 		subreddits: "isometric"
 	},
+
+   //
+   
 	wallpapers: {
-		folderPath: 'E:\\Pictures\\Wallpapers', 
-		subreddits: "mtgporn, wallpapers, WQHD_Wallpaper" 
+		folderPath: `${PicturesPath}/wallpapers`, 
+		subreddits: "wallpapers, WQHD_Wallpaper" 
 	},
 	wallpapers_mobile: {
-		folderPath: 'E:\\Pictures\\Wallpapers mobile', 
+		folderPath: `${PicturesPath}/wallpapers-mobile`, 
 		subreddits: "AnimePhoneWallpapers, MobileWallpaper, Verticalwallpapers" 
 	},
 };
@@ -118,21 +434,18 @@ const bootySubs = {
 	}
 }
 
+const jdrPath = `${NASPath}/books/tabletop-rpg`
 const dungeonSubs = {
 	homebrew: {
-		folderPath: 'E:\\Documents\\JdR\\DD5\\Homebrew raw', 
+		folderPath: `${jdrPath}/DD5/Homebrew raw`,
 		subreddits: "UnearthedArcana"
 	},
-	character_drawings: {
-		folderPath: 'E:\\Documents\\JdR\\DD5\\Character drawings', 
-		subreddits: "characterdrawing"
-	},
 	mapmaking: {
-		folderPath: 'E:\\Documents\\JdR\\DD5\\Maps raw', 
+		folderPath: `${jdrPath}/_maps`,
 		subreddits: "mapmaking"
 	},
 	battlemaps: {
-		folderPath: 'E:\\Documents\\JdR\\DD5\\Battlemaps raw', 
+		folderPath: `${jdrPath}/_battlemaps`,
 		subreddits: "battlemaps"
 	}
 }
@@ -173,19 +486,19 @@ function redditDownload(folderPath, subreddits, options) {
 									${additional} --verbose`)
 }
 
-function sectionDownload(subs, options) {
+function sectionDownload(section, options) {
 	const {limit} = options;
-	const categories = Object.keys(subs);
+	const categories = Object.keys(section);
 
 	for (let i = 0; i < categories.length; i++) {
 		const category = categories[i];
-		const details = subs[category];
+		const {folderPath, subreddits, limit: categoryLimit} = section[category];
 		
 		utils.logLine();
 		utils.logBlue(`Downloading ${category}, folder ${i+1}/${categories.length}`);
 		utils.logLine();
 
-		redditDownload(details.folderPath, details.subreddits, {time: validTimeValues.month, limit: details.limit ? details.limit : limit, skipExisting: false})
+		redditDownload(folderPath ? folderPath : path.join(ImaginaryNetworkPath, category), subreddits, {time: validTimeValues.month, limit: categoryLimit ? categoryLimit : limit, skipExisting: false})
 	}
 }
 
