@@ -1,29 +1,30 @@
-fs = require("fs");
-sharp = require("sharp");
-path = require("path");
+import * as fs from "fs";
+import * as sharp from "sharp";
+import * as path from "path";
+
 const { execSync, exec } = require('child_process');
 
 const separatorBase = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
-const NASPath = "//MOOMINLIBRARY";
+export const NASPath = "//MOOMINLIBRARY";
 
-function getFileNameWithoutExtension(fileName) {
+export function getFileNameWithoutExtension(fileName:string) {
 	const nameSplit = fileName.split(".");
 	nameSplit.pop();
 	return nameSplit.join(".");
 }
 
-function getListOfFilesWithoutExtension(folderPath) {
+export function getListOfFilesWithoutExtension(folderPath:string) {
 	return fs.readdirSync(folderPath).map(getFileNameWithoutExtension);
 }
 
-function fileExistsAnyExtension(file, folderPath) {
+export function fileExistsAnyExtension(file:string, folderPath:string) {
 	const files = getListOfFilesWithoutExtension(folderPath);
 	const fileName = getFileNameWithoutExtension(file);
 
 	return files.indexOf(fileName) > -1;
 }
 
-async function removesFilesFromAifExistsInB(pathA, pathB) {
+export async function removesFilesFromAifExistsInB(pathA:string, pathB:string) {
 	if(!fs.existsSync(pathA)) {
 		logYellow(`${pathA} doesn't exist`);
 		return;
@@ -53,14 +54,14 @@ async function removesFilesFromAifExistsInB(pathA, pathB) {
 	logGreen(`Deleted ${deletedFiles} from ${pathA}`);
 }
 
-function createFolder(folderPath) {
+export function createFolder(folderPath:string) {
 	if (!fs.existsSync(folderPath)){
 		logYellow(`=> creating ${folderPath}`);
     	fs.mkdirSync(folderPath);
     }
 }
 
-function deleteFolder(folderPath) {
+export function deleteFolder(folderPath:string) {
 	if (fs.existsSync(folderPath)){
 		logYellow(`=> deleting ${folderPath}`);
     fs.rmSync(folderPath, { recursive: true, force: true });
@@ -68,7 +69,7 @@ function deleteFolder(folderPath) {
 }
 
 //--summarize and --delete unfortunately not compatible
-function deleteDuplicates(folderPath) {
+export function deleteDuplicates(folderPath:string) {
 	const logFile = path.join(folderPath, "fdupelog.txt");
 	execShell(`C:\\cygwin64\\bin\\bash.exe --login -c 'fdupes --delete --noprompt --sameline "${folderPath}" 2>&1 | tee -a "${logFile}"'`)
 
@@ -86,7 +87,7 @@ function deleteDuplicates(folderPath) {
 	return filesFound;
 }
 
-function deleteSimilar(folderPath, video) {
+export function deleteSimilar(folderPath:string, video?: boolean) {
 	const logname = video ? "czkwlog-video.txt" : "czkwlog.txt";
 	const tempLogFile = path.join(folderPath, logname);
 	let deleted = 0;
@@ -94,7 +95,7 @@ function deleteSimilar(folderPath, video) {
 
 	const log = fs.readFileSync(tempLogFile, 'utf8').split("\n");
 	let filesGroups = [];
-	let temp = [];
+	let temp:string[] = [];
 	log.map(line => {
 		if(line && line.length) {
 			temp.push(line);
@@ -132,47 +133,47 @@ function deleteSimilar(folderPath, video) {
 	return filesFound;
 }
 
-function isFolder(path) {
+export function isFolder(path:string) {
 	return path.split(".").length === 1;
 }
 
-function logBlue(string) {
-	console.log('\x1b[96m%s\x1b[0m', string);
+export function logBlue(stringToLog:string) {
+	console.log('\x1b[96m%s\x1b[0m', stringToLog);
 }
 
-function logGreen(string) {
-	console.log('\x1b[92m%s\x1b[0m', string);
+export function logGreen(stringToLog:string) {
+	console.log('\x1b[92m%s\x1b[0m', stringToLog);
 }
 
-function logYellow(string) {
-	console.log('\x1b[93m%s\x1b[0m', string);
+export function logYellow(stringToLog:string) {
+	console.log('\x1b[93m%s\x1b[0m', stringToLog);
 }
 
-function logRed(string) {
-	console.log('\x1b[91m%s\x1b[0m', string);
+export function logRed(stringToLog:string) {
+	console.log('\x1b[91m%s\x1b[0m', stringToLog);
 }
 
-function logLine() {
+export function logLine() {
 	console.log(" ");
 }
 
-function redString(string) {
-	return `\x1b[91m${string}\x1b[0m`
+export function redString(stringToLog:string) {
+	return `\x1b[91m${stringToLog}\x1b[0m`
 }
 
-function blueString(string) {
-	return `\x1b[96m${string}\x1b[0m`
+export function blueString(stringToLog:string) {
+	return `\x1b[96m${stringToLog}\x1b[0m`
 }
 
-function greenString(string) {
-	return `\x1b[92m${string}\x1b[0m`
+export function greenString(stringToLog:string) {
+	return `\x1b[92m${stringToLog}\x1b[0m`
 }
 
-function yellowString(string) {
-	return `\x1b[93m${string}\x1b[0m`
+export function yellowString(stringToLog:string) {
+	return `\x1b[93m${stringToLog}\x1b[0m`
 }
 
-function execShell(command, isAsync) {
+export function execShell(command:string, isAsync?:boolean) {
 	logLine();
 	logYellow(" " + separator(30));
 	logLine();
@@ -189,32 +190,6 @@ function execShell(command, isAsync) {
 	execSync(command, {stdio:[0,1,2]});
 }
 
-function separator(length) {
+export function separator(length:number) {
 	return separatorBase.substr(0, length);
 }
-
-exports.fileExistsAnyExtension = fileExistsAnyExtension;
-exports.getFileNameWithoutExtension = getFileNameWithoutExtension;
-exports.getListOfFilesWithoutExtension = getListOfFilesWithoutExtension;
-exports.isFolder = isFolder;
-exports.deleteDuplicates = deleteDuplicates;
-
-exports.createFolder = createFolder;
-exports.deleteFolder = deleteFolder;
-exports.deleteSimilar = deleteSimilar;
-exports.removesFilesFromAifExistsInB = removesFilesFromAifExistsInB;
-
-exports.logBlue = logBlue;
-exports.logGreen = logGreen;
-exports.logYellow = logYellow;
-exports.logRed = logRed;
-exports.logLine = logLine;
-
-exports.execShell = execShell;
-exports.separator = separator;
-
-exports.redString = redString;
-exports.yellowString = yellowString;
-exports.blueString = blueString;
-exports.greenString = greenString;
-exports.NASPath = NASPath;
