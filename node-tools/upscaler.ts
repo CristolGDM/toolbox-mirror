@@ -1,9 +1,9 @@
-const path = require("path");
-const fs = require("fs");
-const sharp = require("sharp");
-const utils = require("./utils.js");
+import * as fs from "fs";
+import * as sharp from "sharp";
+import * as path from "path";
+import * as utils from "./utils";
 
-const models = {
+export const models = {
 	nickelback:  "4x_NickelbackFS_72000_G.pth",
 	nmkd:  "4x_NMKD-Superscale-SP_178000_G.pth",
 	lady:  "Lady0101_208000.pth",
@@ -14,15 +14,17 @@ const models = {
 	universal:  "4x_UniversalUpscalerV2-Neutral_115000_swaG.pth",
 	universalSharp:  "4x_UniversalUpscalerV2-Sharp_101000_G.pth",
 	universalSharper:  "4x_UniversalUpscalerV2-Sharper_103000_G.pth"
-}
+} as const;
 
-function upscaleFolderToOutput(inputPath, outputPath, modelName, useTransparency) {
+export type ModelName = typeof models[keyof typeof models];
+
+export function upscaleFolderToOutput(inputPath:string, outputPath:string, modelName: ModelName, useTransparency?: boolean) {
 	const usedModel = modelName ? modelName.endsWith(".pth") ? modelName : `${modelName}.pth` : models.universalSharp;
 	const transparentParameters = useTransparency ? " --ternary-alpha --alpha-mode alpha_separately" : "";
 	utils.execShell(`python E:\\Downloads\\esrgan\\upscale.py "E:\\Downloads\\esrgan\\models\\${usedModel}" --input "${inputPath}" --output "${outputPath}" --skip-existing --verbose ${transparentParameters} -fp16`);
 }
 
-async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeight) {
+export async function upscaleFolder(inputPath:string, modelName: ModelName, outputPath: string, minWidth: number, minHeight?:number) {
 	if(inputPath.endsWith("-toscale") || inputPath.endsWith("-upscaled")) {
 		return;
 	}
@@ -98,7 +100,7 @@ async function upscaleFolder(inputPath, modelName, outputPath, minWidth, minHeig
 	return;
 }
 
-async function convertFolderToJpg(inputFolder, outputFolder) {
+export async function convertFolderToJpg(inputFolder:string, outputFolder:string) {
 	utils.logLine();
 	utils.logGreen("________");
 	utils.logGreen(`Converting ${inputFolder} to Jpg`);
@@ -145,7 +147,7 @@ async function convertFolderToJpg(inputFolder, outputFolder) {
   return;
 }
 
-async function upscalePSX(gameName) {
+export async function upscalePSX(gameName:string) {
 	const folderLocation = "R:/Emulation/PSX"
 	const dumpFolder = `${folderLocation}/${gameName}-texture-dump`;
 	const targetFolder = `${folderLocation}/${gameName}-texture-replacements`;
@@ -177,7 +179,7 @@ async function upscalePSX(gameName) {
 	utils.deleteFolder(tempFolder);
 }
 
-async function upscalePS2(gameName) {
+export async function upscalePS2(gameName: string) {
 	const folderLocation = "R:/PCSX2 1.7.0 dev";
 	const dumpFolder = `${folderLocation}/textures/${gameName}/dumps`;
 	const targetFolder = `${folderLocation}/textures/${gameName}/replacements`;
@@ -209,7 +211,7 @@ async function upscalePS2(gameName) {
 	utils.deleteFolder(tempFolder);
 }
 
-async function upscaleScreenshots() {
+export async function upscaleScreenshots() {
 	const screenshotFolder = "E:/Pictures/Screenshots";
 	const screenshotFolderTemp = "E:/Pictures/zzScreenshots temp";
 	const outputFolder = "E:/Pictures/Screenshots upscaled";
@@ -226,7 +228,7 @@ async function upscaleScreenshots() {
 		utils.logGreen(`Upscaling ${folderName} ${i+1}/${folders.length}`);
 		utils.logGreen("------------------------------------------");
 		utils.logLine();
-		await upscaler.upscaleFolder(path.join(screenshotFolderTemp, folderName), upscaler.models.universalSharp, path.join(outputToDownscale, folderName), 3840);
+		await upscaleFolder(path.join(screenshotFolderTemp, folderName), models.universalSharp, path.join(outputToDownscale, folderName), 3840);
 	}
 
 	for (let i = 0; i < folders.length; i++) {
@@ -236,11 +238,11 @@ async function upscaleScreenshots() {
 		utils.logGreen(`Downscaling ${folderName} ${i+1}/${folders.length}`);
 		utils.logGreen("------------------------------------------");
 		utils.logLine();
-		await upscaler.downscaleFolder(path.join(outputToDownscale, folderName), path.join(outputFolder, folderName), 3840, 2160);
+		await downscaleFolder(path.join(outputToDownscale, folderName), path.join(outputFolder, folderName), 3840, 2160);
 	}
 }
 
-async function downscaleFolder(inputPath, outputPath, width, height) {
+export async function downscaleFolder(inputPath: string, outputPath: string, width: number, height: number) {
 	let x = 1;
 	utils.createFolder(outputPath);
 	const targetFiles = fs.readdirSync(inputPath);
@@ -254,7 +256,7 @@ async function downscaleFolder(inputPath, outputPath, width, height) {
 			await sharp(path.join(inputPath, file))
 			.on("error", (err) => {
 				utils.logRed("on error"); 
-				utils.logRed(err);
+				utils.logRed(err.message);
 			})
 			.resize(width, height, {fit: "outside"})
 			.toFile(path.join(outputPath, file))
@@ -269,13 +271,3 @@ async function downscaleFolder(inputPath, outputPath, width, height) {
 		}
 	}))
 }
-
-exports.upscaleFolder = upscaleFolder;
-exports.upscaleFolderToOutput = upscaleFolderToOutput;
-exports.convertFolderToJpg = convertFolderToJpg;
-exports.upscalePSX = upscalePSX;
-exports.upscalePS2 = upscalePS2;
-exports.upscaleScreenshots = upscaleScreenshots;
-exports.downscaleFolder = downscaleFolder;
-
-exports.models = models;

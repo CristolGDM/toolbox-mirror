@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as sharp from "sharp";
 import * as path from "path";
 
 const { execSync, exec } = require('child_process');
