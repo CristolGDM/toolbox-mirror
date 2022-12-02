@@ -54,7 +54,7 @@ export function redditDownload(folderPath: string, subreddits: string, options: 
 									${additional} --verbose`)
 }
 
-function sectionDownload(section: bdfrSection, options: Pick<bdfrOptions, "limit">) {
+function sectionDownload(section: bdfrSection, options: Omit<bdfrOptions, "time" | "skipExisting">) {
 	const {limit} = options;
 	const categories = Object.keys(section);
 
@@ -66,16 +66,16 @@ function sectionDownload(section: bdfrSection, options: Pick<bdfrOptions, "limit
 		utils.logBlue(`Downloading ${category}, folder ${i+1}/${categories.length}`);
 		utils.logLine();
 
-		redditDownload(folderPath ? folderPath : path.join(ImaginaryNetworkPath, category), subreddits, {time: validTimeValues.month, limit: categoryLimit ? categoryLimit : limit, skipExisting: false})
+		redditDownload(folderPath ? folderPath : path.join(ImaginaryNetworkPath, category), subreddits, {...options, time: validTimeValues.month, limit: categoryLimit ? categoryLimit : limit, skipExisting: false})
 	}
 }
 
 export function imaginaryDownload() {
-	sectionDownload(imaginarySubs, {limit: 200})
+	sectionDownload(imaginarySubs, {limit: 200, openFolder: true})
 };
 
 export function otherDownload() {
-	sectionDownload(otherSubs, {limit: 800});
+	sectionDownload(otherSubs, {limit: 800, openFolder: false});
 }
 
 export function dungeonDownload() {
