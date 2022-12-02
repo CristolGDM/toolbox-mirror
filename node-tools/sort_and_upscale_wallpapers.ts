@@ -1,8 +1,8 @@
-const fs = require("fs");
-const sharp = require("sharp");
-const path = require("path");
-const utils = require("./utils.js");
-const upscaler = require("./upscaler.js");
+import * as fs from "fs";
+import * as sharp from "sharp";
+import * as path from "path";
+import * as utils from "./utils";
+import * as upscaler from "./upscaler";
 
 const wallpaperFolder = "E:/Pictures/Wallpapers";
 const mobileFolder = "E:/Pictures/Wallpapers mobile";
@@ -27,15 +27,15 @@ const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi"];
 
 const knownDupesPath = "E:/Pictures/knownDupes.json";
 
-let finalFiles;
-let tempFiles;
+let finalFiles: string[];
+let tempFiles: string[];
 
-function fileAlreadyExists(fileName) {
+function fileAlreadyExists(fileName: string) {
 	const fileNameCleaned = utils.getFileNameWithoutExtension(fileName);
 	return finalFiles.indexOf(fileNameCleaned) > -1 || tempFiles.indexOf(fileNameCleaned) > -1
 }
 
-async function upscale() {
+export async function upscale() {
 	await upscaler.upscaleFolder(wallpaperTemp, upscaler.models.uniscaleRestore, outputDownscale, 3840);
 	await upscaler.upscaleFolder(mobileTemp, upscaler.models.lollypop, outputMobileDownscale, null, 2400);
 
@@ -56,10 +56,9 @@ function checkDuplicates() {
 	}
 
 	console.log(`Found ${duplicates} dupes`);
-
 };
 
-async function sortStuff() {
+export async function sortAll() {
 	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
 	const knownDupes = await JSON.parse(knownDupesRaw);
 	let foundDupes = 0;
@@ -393,7 +392,7 @@ async function cleanAfterUpscale() {
 	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 }
 
-async function downscale() {
+export async function downscale() {
 	utils.createFolder(outputFinal);
 	utils.createFolder(outputMobile);
 	downscaleDesktop().then(async () => {
@@ -412,7 +411,7 @@ async function downscale() {
 	});
 }
 
-async function convert() {
+export async function convert() {
 	upscaler.convertFolderToJpg(wallpaperToConvert, outputDownscale).then(() => {
 		upscaler.convertFolderToJpg(wallpaperToConvertMobile, outputMobileDownscale)
 	})
@@ -430,10 +429,6 @@ async function clean() {
 	await utils.removesFilesFromAifExistsInB(outputMobileDownscale, outputMobile);
 }
 
-exports.sortAll = sortStuff;
-exports.upscale = upscale;
-exports.convert = convert;
-exports.downscale = downscale;
 exports.clean = clean;
 exports.cleanBeforeUpscale = cleanBeforeUpscale;
 exports.cleanAfterUpscale = cleanAfterUpscale;
