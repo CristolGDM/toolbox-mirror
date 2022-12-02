@@ -13,7 +13,9 @@ export const subs: bdfrSection = {
 	"slice-of-life": {
 		subreddits: "ImaginarySliceOfLife"
 	},
+
 	//
+	
 	archers: {
 		subreddits: "ImaginaryArchers"
 	},
@@ -25,6 +27,9 @@ export const subs: bdfrSection = {
 	},
 	"asian-characters": {
 		subreddits: "ImaginAsian"
+	},
+	"black-characters": {
+		subreddits: "EbonyImagination"
 	},
 	assassins: {
 		subreddits: "ImaginaryAssassins"
@@ -98,6 +103,9 @@ export const subs: bdfrSection = {
 	aetherpunk: {
 		subreddits: "ImaginaryAetherpunk"
 	},
+	steampunk: {
+		subreddits: "ImaginarySteampunk"
+	},
 	armor: {
 		subreddits: "ImaginaryArmor"
 	},
@@ -140,11 +148,41 @@ export const subs: bdfrSection = {
 
    //
 
-	pokemon: {
-		subreddits: "ImaginaryKanto"
+	"dark-souls": {
+		subreddits: "ImaginaryDarkSouls"
+	},
+	"elder-scrolls": {
+		subreddits: "ImaginaryTamriel"
+	},
+	fallout: {
+		subreddits: "ImaginaryFallout"
+	},
+	"game-of-thrones": {
+		subreddits: "ImaginaryWesteros"
+	},
+	"lord-of-the-rings": {
+		subreddits: "ImaginaryMiddleEarth"
 	},
 	"magic-the-gathering": {
 		subreddits: "mtgporn"
+	},
+	marvel: {
+		subreddits: "ImaginaryMarvel"
+	},
+	pokemon: {
+		subreddits: "ImaginaryKanto"
+	},
+	"star-wars": {
+		subreddits: "ImaginaryJedi"
+	},
+	warhammer: {
+		subreddits: "ImaginaryWarhammer"
+	},
+	witcher: {
+		subreddits: "ImaginaryWitcher"
+	},
+	"world-of-warcraft": {
+		subreddits: "ImaginaryAzeroth"
 	},
    
    //
@@ -312,7 +350,7 @@ export const subs: bdfrSection = {
 		subreddits: "ImaginaryBattlefields"
 	},
 	"scenes-with-feels": {
-		subreddits: "ImaginaryFeels"
+		subreddits: "ImaginaryFeels, WholesomeFantasyArt"
 	},
 	gatherings: {
 		subreddits: "ImaginaryGatherings"
