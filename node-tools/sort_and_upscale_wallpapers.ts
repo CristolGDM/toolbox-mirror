@@ -27,26 +27,16 @@ const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi"];
 
 const knownDupesPath = "E:/Pictures/knownDupes.json";
 
-let finalFiles: string[];
-let tempFiles: string[];
 
-function fileAlreadyExists(fileName: string) {
+function fileAlreadyExists(fileName: string, files: string[]) {
 	const fileNameCleaned = utils.getFileNameWithoutExtension(fileName);
-	return finalFiles.indexOf(fileNameCleaned) > -1 || tempFiles.indexOf(fileNameCleaned) > -1
+	return files.indexOf(fileNameCleaned) > -1;
 }
 
-export async function upscale() {
-	await upscaler.upscaleFolder(wallpaperTemp, upscaler.models.uniscaleRestore, outputDownscale, 3840);
-	await upscaler.upscaleFolder(mobileTemp, upscaler.models.lollypop, outputMobileDownscale, null, 2400);
-
-	utils.logGreen("________");
-	utils.logGreen("Finished upscaling");
-};
-
-function checkDuplicates() {
+export function checkDuplicates() {
 	let duplicates = 0;
-	finalFiles = utils.getListOfFilesWithoutExtension(outputFinal).concat(utils.getListOfFilesWithoutExtension(outputMobile));
-	tempFiles = utils.getListOfFilesWithoutExtension(wallpaperTemp).concat(utils.getListOfFilesWithoutExtension(mobileTemp));
+	const finalFiles = utils.getListOfFilesWithoutExtension(outputFinal).concat(utils.getListOfFilesWithoutExtension(outputMobile));
+	const tempFiles = utils.getListOfFilesWithoutExtension(wallpaperTemp).concat(utils.getListOfFilesWithoutExtension(mobileTemp));
 	
 	for (let i = 0; i < tempFiles.length; i++) {
 		const element = tempFiles[i];
@@ -58,6 +48,14 @@ function checkDuplicates() {
 	console.log(`Found ${duplicates} dupes`);
 };
 
+export async function upscale() {
+	await upscaler.upscaleFolder(wallpaperTemp, upscaler.models.uniscaleRestore, outputDownscale, 3840);
+	await upscaler.upscaleFolder(mobileTemp, upscaler.models.lollypop, outputMobileDownscale, null, 2400);
+
+	utils.logGreen("________");
+	utils.logGreen("Finished upscaling");
+};
+
 export async function sortAll() {
 	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
 	const knownDupes = await JSON.parse(knownDupesRaw);
@@ -66,10 +64,15 @@ export async function sortAll() {
 	utils.createFolder(mobileTemp);
 	const imaginaryFolders = fs.readdirSync(imaginaryFolder).filter((folder) => {
 		return folder.indexOf(".") === -1 && folder.indexOf("_logs") === -1;
-	});
+	})
+	imaginaryFolders.push(wallpaperFolder, mobileFolder);
+
+	let files = utils.getListOfFilesWithoutExtension(outputFinal)
+				.concat(utils.getListOfFilesWithoutExtension(outputMobile))
+				.concat(utils.getListOfFilesWithoutExtension(wallpaperTemp))
+				.concat(utils.getListOfFilesWithoutExtension(mobileTemp));
+
 	for (let f = 0; f < imaginaryFolders.length; f++) {
-		finalFiles = utils.getListOfFilesWithoutExtension(outputFinal).concat(utils.getListOfFilesWithoutExtension(outputMobile));
-		tempFiles = utils.getListOfFilesWithoutExtension(wallpaperTemp).concat(utils.getListOfFilesWithoutExtension(mobileTemp));
 		const folder = imaginaryFolders[f];
 		const folderLog = `[${f+1}/${imaginaryFolders.length}] ${folder}`;
 		if(folder.indexOf(".") > -1 || folder.indexOf("bdfr_logs") > -1|| folder.indexOf("test_logs") > -1) {
@@ -119,7 +122,7 @@ export async function sortAll() {
 				imageName =  path.join(imaginaryFolder, folder, shortenedImageName);
 			}
 
-			if(fileAlreadyExists(image)) {
+			if(fileAlreadyExists(image, files)) {
 				console.log("=> Already exists, skipping");
 				return;
 			}
@@ -167,159 +170,6 @@ export async function sortAll() {
 		}));
 	}
 
-	utils.logLine();
-	utils.logBlue("------------------------------------------------------");
-	utils.logBlue("Sorting mobile folder...");
-	utils.logBlue("------------------------------------------------------");
-	utils.logLine();
-
-	const imagesMobile = fs.readdirSync(mobileFolder);
-	finalFiles = utils.getListOfFilesWithoutExtension(outputFinal).concat(utils.getListOfFilesWithoutExtension(outputMobile));
-	tempFiles = utils.getListOfFilesWithoutExtension(wallpaperTemp).concat(utils.getListOfFilesWithoutExtension(mobileTemp));
-
-	await Promise.all(imagesMobile.map(async (image, index) => {
-
-		if(image.startsWith("ImaginaryHorrors_")) {
-			console.log("don't want those, skipping")
-			return;
-		}
-
-		if(image.split(".").length === 1) {
-			console.log(`=> is a folder, skipping`)
-			return;
-		}		
-
-		if(forbiddenExtensions.some((extension) => {return image.endsWith(extension)})) {
-			utils.logYellow("=> wrong file extension, skipping");
-			return;
-		}
-
-		if(fileAlreadyExists(image)) {
-			console.log("=> Already exists, skipping");
-			return;
-		}
-
-		let imageName = `${mobileFolder}/${image}`;
-		if(image.length > 200) {
-			utils.logRed(`=> shortening long name`);
-			const newImageName = image.substring(0, 100) + image.substring(image.length - 100);
-			fs.renameSync(imageName, `${mobileFolder}/${newImageName}`);
-			image = newImageName;
-			imageName = `${mobileFolder}/${newImageName}`;
-		}
-
-		if(knownDupes[utils.getFileNameWithoutExtension(image)]){
-			utils.logRed(`=> is known duplicate`);
-			foundDupes++;
-			return;
-		}
-
-		await sharp(imageName)
-			.metadata()
-			.then(({ width, height }) => {
-				console.log(`Mobile ${index+1} out of ${imagesMobile.length}: ${image}`);
-				if(width/4 >= height/3) {
-					if(width < 1300 || height < 500) {
-						console.log("=> too small, skipping");
-						return;
-					}
-					utils.logBlue("=> moving to desktop");
-					fs.renameSync(path.join(mobileFolder, image), path.join(wallpaperFolder, image));
-					return;
-				}
-
-				else if(height/4 >= width/3) {
-					if(height < 800 || width < 300) {
-						console.log("=> too small, skipping");
-						return;
-					}
-					else if(!utils.fileExistsAnyExtension(image, outputMobile)) {
-						utils.logGreen("=> doesn't exist, moving to upscale folder");
-						fs.writeFileSync(path.join(mobileTemp, image), fs.readFileSync(path.join(mobileFolder, image)));
-						return;
-					}
-				}
-			}
-		);
-		return;
-	}));
-
-	utils.logLine();
-	utils.logBlue("------------------------------------------------------");
-	utils.logBlue("Sorting desktop folder...");
-	utils.logBlue("------------------------------------------------------");
-	utils.logLine();
-
-	const images = fs.readdirSync(wallpaperFolder);
-	finalFiles = utils.getListOfFilesWithoutExtension(outputFinal).concat(utils.getListOfFilesWithoutExtension(outputMobile));
-	tempFiles = utils.getListOfFilesWithoutExtension(wallpaperTemp).concat(utils.getListOfFilesWithoutExtension(mobileTemp));
-
-	await Promise.all(images.map(async (image, index) => {
-
-		if(image.startsWith("ImaginaryHorrors_")) {
-			console.log("don't want those, skipping")
-			return;
-		}
-
-		if(image.split(".").length === 1) {
-			console.log(`=> is a folder, skipping`)
-			return;
-		}
-
-		if(forbiddenExtensions.some((extension) => {return image.endsWith(extension)})) {
-			utils.logYellow("=> wrong file extension, skipping");
-			return;
-		}
-
-		if(fileAlreadyExists(image)) {
-			console.log("=> Already exists, skipping");
-			return;
-		}	
-
-		let imageName = `${wallpaperFolder}/${image}`;
-		if(image.length > 200) {
-			utils.logRed(`=> shortening long name`);
-			const newImageName = image.substring(0, 100) + image.substring(image.length - 100);
-			fs.renameSync(imageName, `${wallpaperFolder}/${newImageName}`);
-			image = newImageName;
-			imageName = `${wallpaperFolder}/${newImageName}`;
-		}
-
-		if(knownDupes[utils.getFileNameWithoutExtension(image)]){
-			utils.logRed(`=> is known duplicate`);
-			foundDupes++;
-			return;
-		}
-
-		await sharp(imageName)
-		  .metadata()
-		  .then(({ width, height }) => {
-				console.log(`Desktop ${index+1} out of ${images.length}: ${image}`);
-				if(height/4 >= width/3) {
-					if(height < 800 || width < 300) {
-						console.log("=> too small, skipping");
-						return;
-					}
-					utils.logBlue("=> moving to mobile");
-		  		fs.renameSync(path.join(wallpaperFolder, image), path.join(mobileFolder, image));
-					return;
-				}
-
-				else if(width/4 >= height/3) {
-					if(width < 1300 || height < 500) {
-						console.log("=> too small, skipping");
-						return;
-					}
-					else if(!utils.fileExistsAnyExtension(image, outputFinal)) {
-						utils.logGreen("=> doesn't exist, moving to upscale folder");
-						fs.writeFileSync(path.join(wallpaperTemp, image), fs.readFileSync(path.join(wallpaperFolder, image)));
-						return;
-					}
-				}
-	  	}
-	  );
-		return;		
-	}));
 	utils.logBlue("------------------------------");
 	utils.logBlue(`Ignored ${foundDupes} duplicates`);
 	utils.logBlue("------------------------------");
@@ -332,64 +182,6 @@ async function downscaleDesktop() {
 
 async function downscaleMobile() {
 	await upscaler.downscaleFolder(outputMobileDownscale, outputMobile, 1080, 2400);
-}
-
-async function cleanBeforeUpscale() {
-	const folders = [
-		wallpaperFolder,
-		mobileFolder,
-		wallpaperTemp,
-		mobileTemp,
-		wallpaperToUpscale,
-		wallpaperToUpscaleMobile,
-		wallpaperToConvert,
-		wallpaperToConvertMobile,
-		outputDownscale,
-		outputMobileDownscale
-	];
-
-	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
-	const knownDupes = await JSON.parse(knownDupesRaw);
-
-	for (let index = 0; index < folders.length; index++) {
-		const folder = folders[index].replace(/\\/g, "/");
-		if(!fs.existsSync(folder)) {
-			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
-			continue;
-		}
-		const foundDupes = utils.deleteDuplicates(folder);
-		foundDupes.map((dupe) => {knownDupes[dupe] = true});
-		const foundDupes2 = utils.deleteSimilar(folder);
-		foundDupes2.map((dupe) => {knownDupes[dupe] = true});
-		console.log(`Finished cleaning ${index+1}/${folders.length}`);
-	}
-	
-	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
-}
-
-async function cleanAfterUpscale() {
-	const folders = [
-		outputFinal,
-		outputMobile
-	]
-
-	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
-	const knownDupes = await JSON.parse(knownDupesRaw);
-
-	for (let index = 0; index < folders.length; index++) {
-		const folder = folders[index].replace(/\\/g, "/");
-		if(!fs.existsSync(folder)) {
-			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
-			continue;
-		}
-		const foundDupes = utils.deleteDuplicates(folder);
-		foundDupes.map((dupe) => {knownDupes[dupe] = true});
-		const foundDupes2 = utils.deleteSimilar(folder);
-		foundDupes2.map((dupe) => {knownDupes[dupe] = true});
-		console.log(`Finished cleaning ${index+1}/${folders.length}`);
-	}
-
-	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 }
 
 export async function downscale() {
@@ -416,20 +208,3 @@ export async function convert() {
 		upscaler.convertFolderToJpg(wallpaperToConvertMobile, outputMobileDownscale)
 	})
 }
-
-async function clean() {
-	await utils.removesFilesFromAifExistsInB(wallpaperTemp, wallpaperToUpscale);
-	await utils.removesFilesFromAifExistsInB(wallpaperToUpscale, wallpaperToConvert);
-	await utils.removesFilesFromAifExistsInB(wallpaperToConvert, outputDownscale);
-	await utils.removesFilesFromAifExistsInB(outputDownscale, outputFinal);
-	
-	await utils.removesFilesFromAifExistsInB(mobileTemp, wallpaperToUpscaleMobile);
-	await utils.removesFilesFromAifExistsInB(wallpaperToUpscaleMobile, wallpaperToConvertMobile);
-	await utils.removesFilesFromAifExistsInB(wallpaperToConvertMobile, outputMobileDownscale);
-	await utils.removesFilesFromAifExistsInB(outputMobileDownscale, outputMobile);
-}
-
-exports.clean = clean;
-exports.cleanBeforeUpscale = cleanBeforeUpscale;
-exports.cleanAfterUpscale = cleanAfterUpscale;
-exports.checkDuplicates = checkDuplicates;
