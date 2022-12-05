@@ -241,9 +241,6 @@ export const subs: bdfrSection = {
 	elementals: {
 		subreddits: "ImaginaryElementals"
 	},
-	horrors: {
-		subreddits: "ImaginaryHorrors"
-	},
 	"animals-hybrids": {
 		subreddits: "ImaginaryHybrids"
 	},
@@ -418,11 +415,14 @@ export const subs: bdfrSection = {
 	cybernetics: {
 		subreddits: "ImaginaryCybernetics"
 	},
-	starscapes: {
+	aliens: {
 		subreddits: "ImaginaryAliens"
 	},
+	starscapes: {
+		subreddits: "ImaginaryStarscapes"
+	},
 	"super-structures": {
-		subreddits: "ImaginaryAliens"
+		subreddits: "SuperStructures"
 	},
 	starships: {
 		subreddits: "ImaginaryStarships, StarshipPorn"
