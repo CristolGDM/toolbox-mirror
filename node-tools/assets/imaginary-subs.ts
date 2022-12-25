@@ -1,7 +1,5 @@
 import { bdfrSection } from "../scraper";
-import {NASPath} from "../utils";
-
-const PicturesPath = `${NASPath}/pictures`;
+import {PicturesPath} from "../utils";
 
 export const subs: bdfrSection = {
 	colorscapes: {

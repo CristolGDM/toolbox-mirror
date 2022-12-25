@@ -5,6 +5,7 @@ import * as fs from "fs";
 import {subs as imaginarySubs} from "./assets/imaginary-subs";
 import {subs as otherSubs} from "./assets/other-subs";
 import {subs as dungeonSubs} from "./assets/dungeon-subs";
+import { deleteDuplicates } from "./cleaner";
 
 export const validTimeValues = {
 	all: "all" as const,
@@ -31,7 +32,7 @@ export const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_
 "redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113", "VorgBardo", "technickr", "TheGeneral1899", "shinarit", "Trigger-red_cannibl", "RobertLiuTrujillo", "okeamu", "MissingAI", "captain_Natjo", "Consistent-Fee3666"];
 
 export function redditDownload(folderPath: string, subreddits: string, options: bdfrOptions) {
-	const { time, limit, skipExisting, additionalArguments, openFolder} = options;
+	const { time, limit, skipExisting, additionalArguments, openFolder, nameFormat} = options;
 	const usedTime = time && validTimeValues[time] ? validTimeValues[time] : validTimeValues.all;
 	utils.logYellow(`Downloading files from top of ${usedTime}`);
 	const usedLimit = limit ? limit : 1000;
@@ -40,6 +41,8 @@ export function redditDownload(folderPath: string, subreddits: string, options: 
 	const skippedUsers = forbiddenUsers.map(user => `--ignore-user "${user}"`).join(" ");
 	const skipExistingParam = skipExisting ? "--search-existing" : "";
 
+	const format = nameFormat ? nameFormat : "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}";
+
 	const logPath = path.join(path.dirname(folderPath), "bdfr_logs");
 	if(openFolder) {
 		utils.createFolder(folderPath);
@@ -47,7 +50,7 @@ export function redditDownload(folderPath: string, subreddits: string, options: 
 	}
 	utils.execShell(`py -m bdfr download "${folderPath}" \
 									--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} \
-									--folder-scheme "./" --file-scheme "{SUBREDDIT}_{REDDITOR}_{TITLE}_{POSTID}" \
+									--folder-scheme "./" --file-scheme "${format}" \
 									${skippedDomains}	${skippedUsers} \
 									--log "${logPath}" \
 									--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" \
@@ -75,11 +78,11 @@ export function imaginaryDownload() {
 };
 
 export function otherDownload() {
-	sectionDownload(otherSubs, {limit: 800, openFolder: false});
+	sectionDownload(otherSubs, {limit: 800, openFolder: false, nameFormat: "{SUBREDDIT}_{REDDITOR}_{TITLE}"});
 }
 
 export function dungeonDownload() {
-	sectionDownload(dungeonSubs, {limit: 80, openFolder: true});
+	sectionDownload(dungeonSubs, {limit: 80, openFolder: true, nameFormat: "{TITLE}"});
 }
 
 export function redditCatchup(folderPath: string, subredditName: string, openFolder: boolean) {
@@ -225,40 +228,9 @@ export async function cleanUnwanted() {
 	utils.logBlue(`Deleted ${found} not so pretty pictures`);
 }
 
-// function cleanImaginary() {
-// 	let  folders = Object.keys(imaginarySubs).map(key => imaginarySubs[key].folderPath);
-// 	folders = folders.concat(Object.keys(dungeonSubs).map(key => dungeonSubs[key].folderPath));
-
-// 	for (let index = 0; index < folders.length; index++) {
-// 		const folder = folders[index].replace(/\\/g, "/");
-// 		if(!fs.existsSync(folder)) {
-// 			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
-// 			continue;
-// 		}
-// 		utils.deleteDuplicates(folder);
-// 		console.log(`Finished cleaning ${index+1}/${folders.length}`)
-// 	}
-// }
-
-export function cleanOthers() {
-	let folders = [... new Set(Object.keys(otherSubs).map(key => otherSubs[key].folderPath))];
-
-	for (let index = 0; index < folders.length; index++) {
-		const folder = folders[index].replace(/\\/g, "/");
-		if(!fs.existsSync(folder)) {
-			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
-			continue;
-		}
-		utils.deleteDuplicates(folder);
-		utils.deleteSimilar(folder);
-		utils.deleteSimilar(folder, true);
-		console.log(`Finished cleaning ${index+1}/${folders.length}`)
-	}
-}
-
 function test() {
 	const testFolder = "E:/Pictures/temp";
-	const dupes = utils.deleteDuplicates(testFolder);
+	const dupes = deleteDuplicates(testFolder);
 	utils.logYellow("Found this:");
 	console.log(dupes);
 	return;
@@ -269,7 +241,8 @@ interface bdfrOptions {
 	limit?: number,
 	skipExisting?: boolean,
 	additionalArguments?: string,
-	openFolder?: boolean
+	openFolder?: boolean,
+	nameFormat?: string,
 }
 
 interface artMetadata {

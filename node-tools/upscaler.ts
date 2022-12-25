@@ -21,7 +21,7 @@ export type ModelName = typeof models[keyof typeof models];
 export function upscaleFolderToOutput(inputPath:string, outputPath:string, modelName: ModelName, useTransparency?: boolean) {
 	const usedModel = modelName ? modelName.endsWith(".pth") ? modelName : `${modelName}.pth` : models.universalSharp;
 	const transparentParameters = useTransparency ? " --ternary-alpha --alpha-mode alpha_separately" : "";
-	utils.execShell(`python E:\\Downloads\\esrgan\\upscale.py "E:\\Downloads\\esrgan\\models\\${usedModel}" --input "${inputPath}" --output "${outputPath}" --skip-existing --verbose ${transparentParameters} -fp16`);
+	utils.execShell(`python L:\\Downloads\\esrgan\\upscale.py "L:\\Downloads\\esrgan\\models\\${usedModel}" --input "${inputPath}" --output "${outputPath}" --skip-existing --verbose ${transparentParameters} -fp16`);
 }
 
 export async function upscaleFolder(inputPath:string, modelName: ModelName, outputPath: string, minWidth: number, minHeight?:number) {
@@ -211,36 +211,36 @@ export async function upscalePS2(gameName: string) {
 	utils.deleteFolder(tempFolder);
 }
 
-export async function upscaleScreenshots() {
-	const screenshotFolder = "E:/Pictures/Screenshots";
-	const screenshotFolderTemp = "E:/Pictures/zzScreenshots temp";
-	const outputFolder = "E:/Pictures/Screenshots upscaled";
-	const outputToDownscale = "E:/Pictures/zzScreenshots to downscale";
-	const folders = fs.readdirSync(screenshotFolder).filter((folder) => {return !folder.startsWith("zz")});
+// export async function upscaleScreenshots() {
+// 	const screenshotFolder = "E:/Pictures/Screenshots";
+// 	const screenshotFolderTemp = "E:/Pictures/zzScreenshots temp";
+// 	const outputFolder = "E:/Pictures/Screenshots upscaled";
+// 	const outputToDownscale = "E:/Pictures/zzScreenshots to downscale";
+// 	const folders = fs.readdirSync(screenshotFolder).filter((folder) => {return !folder.startsWith("zz")});
 
-	utils.execShell(`cp -R "${screenshotFolder}" "${screenshotFolderTemp}"`);
-	utils.execShell(`cp -R "${outputFolder}" "${outputToDownscale}"`);
+// 	utils.execShell(`cp -R "${screenshotFolder}" "${screenshotFolderTemp}"`);
+// 	utils.execShell(`cp -R "${outputFolder}" "${outputToDownscale}"`);
 
-	for (let i = 0; i < folders.length; i++) {
-		const folderName = folders[i];
-		utils.logLine();
-		utils.logGreen("------------------------------------------");
-		utils.logGreen(`Upscaling ${folderName} ${i+1}/${folders.length}`);
-		utils.logGreen("------------------------------------------");
-		utils.logLine();
-		await upscaleFolder(path.join(screenshotFolderTemp, folderName), models.universalSharp, path.join(outputToDownscale, folderName), 3840);
-	}
+// 	for (let i = 0; i < folders.length; i++) {
+// 		const folderName = folders[i];
+// 		utils.logLine();
+// 		utils.logGreen("------------------------------------------");
+// 		utils.logGreen(`Upscaling ${folderName} ${i+1}/${folders.length}`);
+// 		utils.logGreen("------------------------------------------");
+// 		utils.logLine();
+// 		await upscaleFolder(path.join(screenshotFolderTemp, folderName), models.universalSharp, path.join(outputToDownscale, folderName), 3840);
+// 	}
 
-	for (let i = 0; i < folders.length; i++) {
-		const folderName = folders[i];
-		utils.logLine();
-		utils.logGreen("------------------------------------------");
-		utils.logGreen(`Downscaling ${folderName} ${i+1}/${folders.length}`);
-		utils.logGreen("------------------------------------------");
-		utils.logLine();
-		await downscaleFolder(path.join(outputToDownscale, folderName), path.join(outputFolder, folderName), 3840, 2160);
-	}
-}
+// 	for (let i = 0; i < folders.length; i++) {
+// 		const folderName = folders[i];
+// 		utils.logLine();
+// 		utils.logGreen("------------------------------------------");
+// 		utils.logGreen(`Downscaling ${folderName} ${i+1}/${folders.length}`);
+// 		utils.logGreen("------------------------------------------");
+// 		utils.logLine();
+// 		await downscaleFolder(path.join(outputToDownscale, folderName), path.join(outputFolder, folderName), 3840, 2160);
+// 	}
+// }
 
 export async function downscaleFolder(inputPath: string, outputPath: string, width: number, height: number) {
 	let x = 1;

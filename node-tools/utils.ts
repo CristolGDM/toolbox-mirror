@@ -5,6 +5,8 @@ const { execSync, exec } = require('child_process');
 
 const separatorBase = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
 export const NASPath = "//MOOMINLIBRARY";
+export const PicturesPath = `${NASPath}/pictures`;
+export const ImaginaryPath = `${PicturesPath}/imaginary-network`;
 
 export function getFileNameWithoutExtension(fileName:string) {
 	const nameSplit = fileName.split(".");
@@ -65,71 +67,6 @@ export function deleteFolder(folderPath:string) {
 		logYellow(`=> deleting ${folderPath}`);
     fs.rmSync(folderPath, { recursive: true, force: true });
   }
-}
-
-//--summarize and --delete unfortunately not compatible
-export function deleteDuplicates(folderPath:string) {
-	const logFile = path.join(folderPath, "fdupelog.txt");
-	execShell(`C:\\cygwin64\\bin\\bash.exe --login -c 'fdupes --delete --noprompt --sameline "${folderPath}" 2>&1 | tee -a "${logFile}"'`)
-
-	const log = fs.readFileSync(logFile, 'utf8');
-	console.log(log);
-	logGreen(`=> Found and deleted ${log.split("[-]").length -1} duplicates`);
-
-	const folder = path.dirname(logFile).replace(/\\/g, "/") + "/";
-	console.log(folder);
-	const filesFound = log.split("\n")
-											.filter(file => file.indexOf(folder) > -1)
-											.map(file => path.parse(file.split(folder)[1]).name);
-
-	// deleteFolder(logFile);
-	return filesFound;
-}
-
-export function deleteSimilar(folderPath:string, video?: boolean) {
-	const logname = video ? "czkwlog-video.txt" : "czkwlog.txt";
-	const tempLogFile = path.join(folderPath, logname);
-	let deleted = 0;
-	execShell(`E:\\Downloads\\windows_czkawka_cli.exe ${video ? "video" : "image"} --directories "${folderPath}" -f "${tempLogFile}"`);
-
-	const log = fs.readFileSync(tempLogFile, 'utf8').split("\n");
-	let filesGroups = [];
-	let temp:string[] = [];
-	log.map(line => {
-		if(line && line.length) {
-			temp.push(line);
-		} else if (temp.length) {
-			filesGroups.push(temp);
-			temp = [];
-		}
-	});
-
-	if(temp.length > 0) {
-		filesGroups.push(temp);
-	}
-	filesGroups = filesGroups.filter((group) => {return group.length >= 3})
-													.map((group) => {
-														group.shift();
-														group = group.map((file) => {
-															let split = file.split(" - ");
-															split = split.slice(0, video ? -1 : -3);
-															return split.join(" - ");
-														})
-														return group;
-													});
-	filesGroups.forEach((group) => {
-		const files = [...group];
-		files.shift();
-		files.forEach((file) => {
-			deleteFolder(file);
-			deleted++;
-		})
-	});
-	logGreen(`=> Found and deleted ${deleted} similar ${video ? "videos" : "images"}`);
-	const filesFound = filesGroups.flat().map((file) => {
-		return path.basename(file, path.extname(file))
-	});
-	return filesFound;
 }
 
 export function isFolder(path:string) {
