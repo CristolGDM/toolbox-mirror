@@ -5,25 +5,28 @@ import * as utils from "./utils";
 import * as upscaler from "./upscaler";
 
 import {subs as imaginarySubs} from "./assets/imaginary-subs";
+import { NASPath } from "./utils";
 
-const wallpaperTemp = "E:/Pictures/zzzWallpapers temp";
-const mobileTemp = "E:/Pictures/zzzWallpapers mobile temp";
+const localPicturesPath = "L:/Pictures/wp-up";
 
-const outputFinal = "E:/Pictures/Wallpapers final";
-const outputMobile = "E:/Pictures/Wallpapers mobile final";
+const wallpaperTemp = `${localPicturesPath}/zzzWallpapers temp`;
+const mobileTemp = `${localPicturesPath}/zzzWallpapers mobile temp`;
 
-const wallpaperToUpscale = "E:/Pictures/zzzWallpapers temp-toscale";
-const wallpaperToUpscaleMobile = "E:/Pictures/zzzWallpapers mobile temp-toscale";
+const outputFinal = `${NASPath}/pictures/wallpapers-upscaled-desktop`;
+const outputMobile = `${NASPath}/pictures/wallpapers-upscaled-mobile`;
 
-const wallpaperToConvert = "E:/Pictures/zzzWallpapers temp-upscaled";
-const wallpaperToConvertMobile = "E:/Pictures/zzzWallpapers mobile temp-upscaled";
+const wallpaperToUpscale = `${localPicturesPath}/zzzWallpapers temp-toscale`;
+const wallpaperToUpscaleMobile = `${localPicturesPath}/zzzWallpapers mobile temp-toscale`;
 
-const outputDownscale = "E:/Pictures/zzzWallpapers to downscale";
-const outputMobileDownscale = "E:/Pictures/zzzWallpapers mobile to downscale";
+const wallpaperToConvert = `${localPicturesPath}/zzzWallpapers temp-upscaled`;
+const wallpaperToConvertMobile = `${localPicturesPath}/zzzWallpapers mobile temp-upscaled`;
+
+const outputDownscale = `${localPicturesPath}/zzzWallpapers to downscale`;
+const outputMobileDownscale = `${localPicturesPath}/zzzWallpapers mobile to downscale`;
 
 const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi"];
 
-const knownDupesPath = "E:/Pictures/knownDupes.json";
+export const knownDupesPath = `${NASPath}/pictures/knownDupes.json`;
 
 
 function fileAlreadyExists(fileName: string, files: string[]) {
@@ -38,6 +41,14 @@ export function getImaginaryFolders() {
 		const sub = imaginarySubs[subName];
 		return sub.folderPath ?? path.join(utils.ImaginaryPath, subName)
 	})
+}
+
+export function getUpscaleFolders() {
+	return [wallpaperTemp, mobileTemp, wallpaperToUpscale, wallpaperToUpscaleMobile, wallpaperToConvert, wallpaperToConvertMobile, outputDownscale, outputMobileDownscale];
+}
+
+export function getFinalFolders() {
+	return [outputFinal, outputMobile];
 }
 
 export function checkDuplicates() {
@@ -55,9 +66,21 @@ export function checkDuplicates() {
 	console.log(`Found ${duplicates} dupes`);
 };
 
-export async function upscale() {
+export async function upscaleDesktop() {
 	await upscaler.upscaleFolder(wallpaperTemp, upscaler.models.uniscaleRestore, outputDownscale, 3840);
+	utils.logBlue("________");
+	utils.logBlue("Finished upscaling desktop");
+}
+
+export async function upscaleMobile() {
 	await upscaler.upscaleFolder(mobileTemp, upscaler.models.lollypop, outputMobileDownscale, null, 2400);
+	utils.logBlue("________");
+	utils.logBlue("Finished upscaling mobile");
+}
+
+export async function upscale() {
+	await upscaleDesktop();
+	await upscaleMobile();
 
 	utils.logGreen("________");
 	utils.logGreen("Finished upscaling");
@@ -69,7 +92,8 @@ export async function sortAll() {
 	let foundDupes = 0;
 	utils.createFolder(wallpaperTemp);
 	utils.createFolder(mobileTemp);
-	const imaginaryFolders = getImaginaryFolders()
+	const imaginaryFolders = getImaginaryFolders();
+	console.log(imaginaryFolders);
 
 	let files = utils.getListOfFilesWithoutExtension(outputFinal)
 				.concat(utils.getListOfFilesWithoutExtension(outputMobile))
@@ -80,9 +104,6 @@ export async function sortAll() {
 		const folderPath = imaginaryFolders[f];
 		const folder = path.basename(folderPath)
 		const folderLog = `[${f+1}/${imaginaryFolders.length}] ${folder}`;
-		if(folder.indexOf(".") > -1 || folder.indexOf("bdfr_logs") > -1|| folder.indexOf("test_logs") > -1) {
-			continue;
-		}
 		
 		utils.logLine();
 		utils.logBlue("------------------------------------------------------");
@@ -104,20 +125,16 @@ export async function sortAll() {
 				return;
 			}
 
-			let imageName = path.join(folderPath, image);
+			let imagePath = path.join(folderPath, image);
 			if(image.endsWith("unknown_video") || image.endsWith("UNKNOWN_VIDEO")) {
-				utils.logRed(`=> cleaning unknown video format`);
-				const imageNameWithRealExtension = utils.getFileNameWithoutExtension(image) + ".png";
-				fs.renameSync(imageName, path.join(folderPath, imageNameWithRealExtension));
-				image = imageNameWithRealExtension;
-				imageName =  path.join(folderPath, imageNameWithRealExtension);
+				utils.deleteFolder(imagePath);
 			}
 			if(image.length > 200) {
 				utils.logRed(`=> shortening long name`);
 				const shortenedImageName = image.substring(0, 100) + image.substring(image.length - 100);
-				fs.renameSync(imageName, path.join(folderPath, shortenedImageName));
+				fs.renameSync(imagePath, path.join(folderPath, shortenedImageName));
 				image = shortenedImageName;
-				imageName =  path.join(folderPath, shortenedImageName);
+				imagePath =  path.join(folderPath, shortenedImageName);
 			}
 
 			if(fileAlreadyExists(image, files)) {
@@ -131,7 +148,7 @@ export async function sortAll() {
 				return;
 			}
 
-			await sharp(imageName)
+			await sharp(imagePath)
 				.metadata()
 				.then(({ width, height }) => {
 					console.log(`${folderLog} - ${index} out of ${images.length}: ${image}`);

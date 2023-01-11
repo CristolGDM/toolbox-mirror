@@ -6,6 +6,7 @@ import {subs as imaginarySubs} from "./assets/imaginary-subs";
 import {subs as otherSubs} from "./assets/other-subs";
 import {subs as dungeonSubs} from "./assets/dungeon-subs";
 import { deleteDuplicates } from "./cleaner";
+import { getFinalFolders, getImaginaryFolders, getUpscaleFolders } from "./wallpapers";
 
 export const validTimeValues = {
 	all: "all" as const,
@@ -29,7 +30,7 @@ export const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_
 "B0B_22", "Taguel16", "Cab0san", "RowzeiChan", "Hollz23", "TripleA2006", "championsgamer1", "Reykurinn", "AgentB90",
 "comics0026", "AimlessGrace", "axes_and_asses", "ImperatorZor", "HellsJuggernaut", "angelberries", "FoolishMacaroni",
 "nbolen13", "Space_Fox586", "EwokTheGreatPrp", "EmeraldScales", "ClassicFrancois18", "pweavd", "smolb0i", "improy",
-"redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113", "VorgBardo", "technickr", "TheGeneral1899", "shinarit", "Trigger-red_cannibl", "RobertLiuTrujillo", "okeamu", "MissingAI", "captain_Natjo", "Consistent-Fee3666"];
+"redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "Nyao", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113", "VorgBardo", "technickr", "TheGeneral1899", "shinarit", "Trigger-red_cannibl", "RobertLiuTrujillo", "okeamu", "MissingAI", "captain_Natjo", "Consistent-Fee3666", "SiarX", "BeepBoopRainbow", "RowzeiChan", "everyteendrama", "WolfGuardia", "BulletBudgie", "HypedGymBro", "Nanduihir", "LenKagamine12", "AnemicIronman", "SeaborderCoast", "SqueakSquawk4", "TheElepehantInDeRoom", "Tackyinbention", "Raptorwolf_AML", "Particular_Fix1211", "scr33ner", "xxxnobitaxxx", "MrZorg58", "jackhammerrrrr", "Fair591", "factory_reset_button", "Neffthecloud", "Careful_Strategy_711", "kaburgadolmasi", "SaltedSam", "Physical-Pizza-5738"];
 
 export function redditDownload(folderPath: string, subreddits: string, options: bdfrOptions) {
 	const { time, limit, skipExisting, additionalArguments, openFolder, nameFormat} = options;
@@ -178,19 +179,15 @@ export function sortArt() {
 
 export async function cleanUnwanted() {
 	let found = 0;
-	let  folders = Object.keys(imaginarySubs).map(key => imaginarySubs[key].folderPath);
+	let index = 0;
+	let  folders = getImaginaryFolders();
 	folders = folders.concat(Object.keys(otherSubs).map(key => otherSubs[key].folderPath));
 	folders = folders.concat(Object.keys(dungeonSubs).map(key => dungeonSubs[key].folderPath));
-	folders.push("E:\\Pictures\\zzzWallpapers temp");
-	folders.push("E:\\Pictures\\zzzWallpapers temp-toscale");
-	folders.push("E:\\Pictures\\zzzWallpapers temp-upscaled");
-	folders.push("E:\\Pictures\\zzzWallpapers to downscale");
-	folders.push("E:\\Pictures\\zzzWallpapers mobile temp");
-	folders.push("E:\\Pictures\\zzzWallpapers mobile temp-toscale");
-	folders.push("E:\\Pictures\\zzzWallpapers mobile temp-upscaled");
-	folders.push("E:\\Pictures\\zzzWallpapers mobile to downscale");
-	
+	folders = folders.concat(getUpscaleFolders());
+	folders = folders.concat(getFinalFolders());
+
 	folders.forEach(async (folderRaw) => {
+		index++;
 		const folder = folderRaw.replace(/\\/g, "/");
 		let folderFound = 0;
 		if(!fs.existsSync(folder)) {
@@ -222,7 +219,10 @@ export async function cleanUnwanted() {
 			folderFound++;
 		});
 		if(folderFound > 0) {
-			utils.logGreen(`Deleted ${folderFound} from ${path.basename(folder)}`);
+			utils.logGreen(`${index}/${folders.length}: Deleted ${folderFound} from ${path.basename(folder)}`);
+		}
+		else {
+			utils.logYellow(`${index}/${folders.length}: Nothing in ${path.basename(folder)}`);
 		}
 	});
 	utils.logBlue(`Deleted ${found} not so pretty pictures`);

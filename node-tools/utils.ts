@@ -58,7 +58,7 @@ export async function removesFilesFromAifExistsInB(pathA:string, pathB:string) {
 export function createFolder(folderPath:string) {
 	if (!fs.existsSync(folderPath)){
 		logYellow(`=> creating ${folderPath}`);
-    	fs.mkdirSync(folderPath);
+    	fs.mkdirSync(folderPath, {recursive: true});
     }
 }
 
