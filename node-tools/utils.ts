@@ -62,6 +62,11 @@ export function createFolder(folderPath:string) {
     }
 }
 
+export function openImageFolder(folderPath: string) {
+	createFolder(folderPath);
+	execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${folderPath}"`, true)
+}
+
 export function deleteFolder(folderPath:string) {
 	if (fs.existsSync(folderPath)){
 		logYellow(`=> deleting ${folderPath}`);
