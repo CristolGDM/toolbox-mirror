@@ -24,24 +24,26 @@ export function upscaleFolderToOutput(inputPath:string, outputPath:string, model
 	utils.execShell(`python L:\\Downloads\\esrgan\\upscale.py "L:\\Downloads\\esrgan\\models\\${usedModel}" --input "${inputPath}" --output "${outputPath}" --skip-existing --verbose ${transparentParameters} -fp16`);
 }
 
+export function getTempScaleFolderName(originalFolderName: string) {
+	return `${originalFolderName}-toscale`;
+}
+
 export async function upscaleFolder(inputPath:string, modelName: ModelName, outputPath: string, minWidth: number, minHeight?:number) {
 	if(inputPath.endsWith("-toscale") || inputPath.endsWith("-upscaled")) {
 		return;
 	}
 	utils.logLine();
 	const desiredWidth = minWidth ? minWidth : 3840;
-	const toUpscalename = `${inputPath}-toscale`;
+	const toUpscalename = getTempScaleFolderName(inputPath);
 	const upscaledFolderName = `${inputPath}-upscaled`;
+	const actualOutput = outputPath ?? upscaledFolderName;
 	utils.createFolder(toUpscalename);
-	utils.createFolder(upscaledFolderName);
-	if(outputPath) {
-		utils.createFolder(outputPath);
-	}
+	utils.createFolder(actualOutput);
 	utils.logLine();
 	const images = fs.readdirSync(inputPath);
 	const toUpscaleImages = fs.readdirSync(toUpscalename).map(utils.getFileNameWithoutExtension);
-	const upscaledImages = fs.readdirSync(upscaledFolderName).map(utils.getFileNameWithoutExtension);
-	const doneImages = outputPath ? fs.readdirSync(outputPath).map(utils.getFileNameWithoutExtension) : [];
+	const upscaledImages = fs.readdirSync(actualOutput).map(utils.getFileNameWithoutExtension);
+	const doneImages = fs.readdirSync(actualOutput).map(utils.getFileNameWithoutExtension);
 	await Promise.all(images.map(async (imageName, index) => {
 		if(imageName.endsWith(".txt"))
 			{
@@ -60,36 +62,36 @@ export async function upscaleFolder(inputPath:string, modelName: ModelName, outp
 		  .then(({ width, height }) => {
 				console.log(`${index+1} out of ${images.length}: ${imageName}`);
 				const shouldUpscale = minHeight ? height < minHeight : width < desiredWidth;
-		  	if(!shouldUpscale) {
-		  		console.log(`=> moving to conversion folder`);
-		  		fs.writeFileSync(path.join(upscaledFolderName, imageName), fs.readFileSync(path.join(inputPath, imageName)));
-		  	}
-		  	else {
-		  		console.log(`=> moving to upscale folder`);
-		  		fs.writeFileSync(path.join(toUpscalename, imageName), fs.readFileSync(path.join(inputPath, imageName)));
-		  	}
+				if(!shouldUpscale) {
+					console.log(`=> moving to upscaled folder`);
+					fs.writeFileSync(path.join(actualOutput, imageName), fs.readFileSync(path.join(inputPath, imageName)));
+				}
+				else {
+					console.log(`=> moving to upscale folder`);
+					fs.writeFileSync(path.join(toUpscalename, imageName), fs.readFileSync(path.join(inputPath, imageName)));
+				}
 	  	}
 	  );		
 	}))
 
 	utils.logLine();
-	upscaleFolderToOutput(toUpscalename, upscaledFolderName, modelName);
+	upscaleFolderToOutput(toUpscalename, actualOutput, modelName);
 
-	if(!outputPath) {
-		utils.logLine();
-		utils.deleteFolder(inputPath);
-		utils.createFolder(inputPath);
+	// if(!outputPath) {
+	// 	utils.logLine();
+	// 	utils.deleteFolder(inputPath);
+	// 	utils.createFolder(inputPath);
 	
-		utils.logLine();
-		await convertFolderToJpg(upscaledFolderName, inputPath);
-	}
-	else {
-		utils.logLine();
-		utils.createFolder(outputPath);
+	// 	utils.logLine();
+	// 	await convertFolderToJpg(upscaledFolderName, inputPath);
+	// }
+	// else {
+	// 	utils.logLine();
+	// 	utils.createFolder(outputPath);
 	
-		utils.logLine();
-		await convertFolderToJpg(upscaledFolderName, outputPath);
-	}
+	// 	utils.logLine();
+	// 	await convertFolderToJpg(upscaledFolderName, outputPath);
+	// }
 
 	utils.logLine();
 	// utils.deleteFolder(toUpscalename);

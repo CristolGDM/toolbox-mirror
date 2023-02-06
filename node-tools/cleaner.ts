@@ -1,11 +1,14 @@
 import * as fs from "fs";
 import * as utils from "./utils";
 import { subs as otherSubs } from "./assets/other-subs";
-import { getFinalFolders, getImaginaryFolders, getUpscaleFolders, knownDupesPath } from "./wallpapers";
+import { getDungeonFolders, getFinalFolders, getImaginaryFolders, getUpscaleFolders, knownDupesPath } from "./wallpapers";
 import path = require("path");
 
 export async function cleanImaginary() {
 	const subs = getImaginaryFolders();
+	let total = 0;
+
+	// const index = subs.findIndex((value) => {return value.indexOf("colorscapes") > -1})
 
 	for (let i = 0; i < subs.length; i++) {
 		const subPath = subs[i];
@@ -13,11 +16,48 @@ export async function cleanImaginary() {
 
 		// deleteSimilar(subPath);
 		// utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
-		deleteDuplicates(subPath);
+		const results = deleteDuplicates(subPath).length/2;
+		total += Math.ceil(results);
+		utils.logBlue(`Currently at ${total} total duplicate found`);
+		console.log("");
+		console.log("------------------------------------------------------------------------------------");
+		console.log("------------------------------------------------------------------------------------");
+		console.log("");
 	}
+
+	utils.logGreen(`========================`);
+	utils.logGreen(`CLEANED ${total} DUPLICATES`);
+	utils.logGreen(`========================`);
+}
+
+export async function cleanDungeon() {
+	const subs = getDungeonFolders();
+	let total = 0;
+
+	for (let i = 0; i < subs.length; i++) {
+		const subPath = subs[i];
+		utils.logBlue(`Cleaning (${i+1}/${subs.length}): ${subPath}`);
+
+		const results1 = deleteSimilar(subPath).length/2;
+		utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
+		const results2 = deleteDuplicates(subPath).length/2;
+		total += Math.ceil(results1);
+		total += Math.ceil(results2);
+		utils.logBlue(`Currently at ${total} total duplicate found`);
+		console.log("");
+		console.log("------------------------------------------------------------------------------------");
+		console.log("------------------------------------------------------------------------------------");
+		console.log("");
+	}
+
+	utils.logGreen(`========================`);
+	utils.logGreen(`CLEANED ${total} DUPLICATES`);
+	utils.logGreen(`========================`);
 }
 
 export async function cleanBeforeUpscale() {
+	const timerLabel = "cleaning before upscale took:";
+	console.time(timerLabel);
 	const folders = getUpscaleFolders();
 	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
 	const knownDupes = await JSON.parse(knownDupesRaw);
@@ -36,9 +76,12 @@ export async function cleanBeforeUpscale() {
 	}
 	
 	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
+	console.timeEnd(timerLabel);
 }
 
 export async function cleanAfterUpscale() {
+	const timerLabel = "cleaning after upscale took:";
+	console.time(timerLabel);
 	const folders = getFinalFolders()
 
 	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
@@ -58,6 +101,7 @@ export async function cleanAfterUpscale() {
 	}
 
 	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
+	console.timeEnd(timerLabel);
 }
 
 export function cleanOthers() {

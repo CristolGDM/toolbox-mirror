@@ -5,24 +5,25 @@ import * as utils from "./utils";
 import * as upscaler from "./upscaler";
 
 import {subs as imaginarySubs} from "./assets/imaginary-subs";
+import {subs as dungeonSubs} from "./assets/dungeon-subs";
 import { NASPath } from "./utils";
 
 const localPicturesPath = "L:/Pictures/wp-up";
 
-const wallpaperTemp = `${localPicturesPath}/zzzWallpapers temp`;
-const mobileTemp = `${localPicturesPath}/zzzWallpapers mobile temp`;
+const wallpaperTemp = `${localPicturesPath}/desk-orig`;
+const mobileTemp = `${localPicturesPath}/mob-orig`;
 
 const outputFinal = `${NASPath}/pictures/wallpapers-upscaled-desktop`;
 const outputMobile = `${NASPath}/pictures/wallpapers-upscaled-mobile`;
 
-const wallpaperToUpscale = `${localPicturesPath}/zzzWallpapers temp-toscale`;
-const wallpaperToUpscaleMobile = `${localPicturesPath}/zzzWallpapers mobile temp-toscale`;
+const wallpaperToUpscale = upscaler.getTempScaleFolderName(wallpaperTemp);
+const wallpaperToUpscaleMobile = upscaler.getTempScaleFolderName(mobileTemp);
 
-const wallpaperToConvert = `${localPicturesPath}/zzzWallpapers temp-upscaled`;
-const wallpaperToConvertMobile = `${localPicturesPath}/zzzWallpapers mobile temp-upscaled`;
+const wallpaperToConvert = `${localPicturesPath}/desk-toconvert`;
+const wallpaperToConvertMobile = `${localPicturesPath}/mob-toconvert`;
 
-const outputDownscale = `${localPicturesPath}/zzzWallpapers to downscale`;
-const outputMobileDownscale = `${localPicturesPath}/zzzWallpapers mobile to downscale`;
+const outputToDownscale = `${localPicturesPath}/desk-todown`;
+const outputMobileToDownscale = `${localPicturesPath}/mob-todown`;
 
 const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi"];
 
@@ -40,11 +41,20 @@ export function getImaginaryFolders() {
 	return subNames.map((subName) => {
 		const sub = imaginarySubs[subName];
 		return sub.folderPath ?? path.join(utils.ImaginaryPath, subName)
-	})
+	}).sort();
+}
+
+export function getDungeonFolders() {
+	const subNames = Object.keys(dungeonSubs);
+
+	return subNames.map((subName) => {
+		const sub = dungeonSubs[subName];
+		return sub.folderPath;
+	});
 }
 
 export function getUpscaleFolders() {
-	return [wallpaperTemp, mobileTemp, wallpaperToUpscale, wallpaperToUpscaleMobile, wallpaperToConvert, wallpaperToConvertMobile, outputDownscale, outputMobileDownscale];
+	return [wallpaperTemp, mobileTemp, wallpaperToUpscale, wallpaperToUpscaleMobile, wallpaperToConvert, wallpaperToConvertMobile, outputToDownscale, outputMobileToDownscale];
 }
 
 export function getFinalFolders() {
@@ -67,33 +77,51 @@ export function checkDuplicates() {
 };
 
 export async function upscaleDesktop() {
-	await upscaler.upscaleFolder(wallpaperTemp, upscaler.models.uniscaleRestore, outputDownscale, 3840);
+	utils.openImageFolder(wallpaperToConvert);
+	await upscaler.upscaleFolder(wallpaperTemp, upscaler.models.uniscaleRestore, wallpaperToConvert, 3840);
 	utils.logBlue("________");
 	utils.logBlue("Finished upscaling desktop");
 }
 
 export async function upscaleMobile() {
-	await upscaler.upscaleFolder(mobileTemp, upscaler.models.lollypop, outputMobileDownscale, null, 2400);
+	utils.openImageFolder(wallpaperToConvertMobile);
+	await upscaler.upscaleFolder(mobileTemp, upscaler.models.lollypop, wallpaperToConvertMobile, null, 2400);
 	utils.logBlue("________");
 	utils.logBlue("Finished upscaling mobile");
 }
 
-export async function upscale() {
-	await upscaleDesktop();
-	await upscaleMobile();
+export function upscale() {
+	upscaleDesktop().then(() => {
+		utils.logLine();
+		utils.logGreen(utils.separator(30));
+		utils.logGreen("Finished upscaling desktop folder");
+		utils.logGreen(utils.separator(30));
+		utils.logLine();
+		upscaleMobile().then(() => {
+			utils.logLine();
+			utils.logGreen(utils.separator(30));
+			utils.logGreen("Finished upscaling mobile folder");
+			utils.logGreen(utils.separator(30));
+			utils.logLine();
+			utils.logLine();
 
-	utils.logGreen("________");
-	utils.logGreen("Finished upscaling");
+			utils.logBlue(utils.separator(30));
+			utils.logBlue(utils.separator(30));
+			utils.logBlue(utils.separator(30));
+			utils.logBlue("Finished upscaling");
+		});
+	})
 };
 
 export async function sortAll() {
+	const timerLabel = "sortAll() current time: "
+	console.time(timerLabel)
 	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
 	const knownDupes = await JSON.parse(knownDupesRaw);
 	let foundDupes = 0;
 	utils.createFolder(wallpaperTemp);
 	utils.createFolder(mobileTemp);
 	const imaginaryFolders = getImaginaryFolders();
-	console.log(imaginaryFolders);
 
 	let files = utils.getListOfFilesWithoutExtension(outputFinal)
 				.concat(utils.getListOfFilesWithoutExtension(outputMobile))
@@ -153,6 +181,10 @@ export async function sortAll() {
 				.then(({ width, height }) => {
 					console.log(`${folderLog} - ${index} out of ${images.length}: ${image}`);
 					if(width/4 >= height/3) {
+						if(image.toLowerCase().startsWith("verticalwallpapers")) {
+							console.log("=> desktop sized mobile wallpaper");
+							return;
+						}
 						if(width < 1300 || height < 500) {
 							console.log("=> too small, skipping");
 							return;
@@ -171,6 +203,7 @@ export async function sortAll() {
 					else {
 						console.log("=> wrong ratio, skipping");
 					}
+					console.timeLog(timerLabel);
 				}
 			)
 			.catch((error) => {
@@ -191,24 +224,30 @@ export async function sortAll() {
 	return;
 }
 
-async function downscaleDesktop() {
-	await upscaler.downscaleFolder(outputDownscale, outputFinal, 3840, 2160);
+export async function downscaleDesktop() {
+	utils.openImageFolder(outputFinal);
+	await upscaler.downscaleFolder(outputToDownscale, outputFinal, 3840, 2160);
 }
 
-async function downscaleMobile() {
-	await upscaler.downscaleFolder(outputMobileDownscale, outputMobile, 1080, 2400);
+export async function downscaleMobile() {
+	utils.openImageFolder(outputMobile);
+	await upscaler.downscaleFolder(outputMobileToDownscale, outputMobile, 1080, 2400);
 }
 
 export async function downscale() {
+	const timer = "downscaling took ";
+	console.time(timer);
 	utils.createFolder(outputFinal);
 	utils.createFolder(outputMobile);
 	downscaleDesktop().then(async () => {
+		console.timeLog(timer);
 		utils.logLine();
 		utils.logGreen(utils.separator(30));
 		utils.logGreen("Finished downscaling desktop folder");
 		utils.logGreen(utils.separator(30));
 		utils.logLine();
 		downscaleMobile().then(() => {
+			console.timeLog(timer);
 			utils.logLine();
 			utils.logGreen(utils.separator(30));
 			utils.logGreen("Finished downscaling mobile folder");
@@ -218,8 +257,32 @@ export async function downscale() {
 	});
 }
 
-export async function convert() {
-	upscaler.convertFolderToJpg(wallpaperToConvert, outputDownscale).then(() => {
-		upscaler.convertFolderToJpg(wallpaperToConvertMobile, outputMobileDownscale)
+export async function convertDesktop() {
+	upscaler.convertFolderToJpg(wallpaperToConvert, outputToDownscale)
+}
+
+export async function convertMobile() {
+	upscaler.convertFolderToJpg(wallpaperToConvertMobile, outputMobileToDownscale)
+}
+export function convert() {
+	const timer = "converting took ";
+	console.time(timer);
+	utils.createFolder(outputToDownscale);
+	utils.createFolder(outputMobileToDownscale);
+	convertDesktop().then(() => {
+		console.timeLog(timer);
+		utils.logLine();
+		utils.logGreen(utils.separator(30));
+		utils.logGreen("Finished converting desktop folder");
+		utils.logGreen(utils.separator(30));
+		utils.logLine();
+		convertMobile().then(() => {
+			console.timeLog(timer);
+			utils.logLine();
+			utils.logGreen(utils.separator(30));
+			utils.logGreen("Finished converting mobile folder");
+			utils.logGreen(utils.separator(30));
+			utils.logLine();
+		})
 	})
 }

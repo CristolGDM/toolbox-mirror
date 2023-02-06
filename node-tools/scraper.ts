@@ -30,7 +30,7 @@ export const forbiddenUsers = ["GaroShadowscale", "vodcato-ventrexian", "Tundra_
 "B0B_22", "Taguel16", "Cab0san", "RowzeiChan", "Hollz23", "TripleA2006", "championsgamer1", "Reykurinn", "AgentB90",
 "comics0026", "AimlessGrace", "axes_and_asses", "ImperatorZor", "HellsJuggernaut", "angelberries", "FoolishMacaroni",
 "nbolen13", "Space_Fox586", "EwokTheGreatPrp", "EmeraldScales", "ClassicFrancois18", "pweavd", "smolb0i", "improy",
-"redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "Nyao", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113", "VorgBardo", "technickr", "TheGeneral1899", "shinarit", "Trigger-red_cannibl", "RobertLiuTrujillo", "okeamu", "MissingAI", "captain_Natjo", "Consistent-Fee3666", "SiarX", "BeepBoopRainbow", "RowzeiChan", "everyteendrama", "WolfGuardia", "BulletBudgie", "HypedGymBro", "Nanduihir", "LenKagamine12", "AnemicIronman", "SeaborderCoast", "SqueakSquawk4", "TheElepehantInDeRoom", "Tackyinbention", "Raptorwolf_AML", "Particular_Fix1211", "scr33ner", "xxxnobitaxxx", "MrZorg58", "jackhammerrrrr", "Fair591", "factory_reset_button", "Neffthecloud", "Careful_Strategy_711", "kaburgadolmasi", "SaltedSam", "Physical-Pizza-5738"];
+"redcomet0079", "BadSpellign", "Cromwell300", "Meadowlark", "Ambratolm", "Caliglo37", "veronicasylvaxxx", "EmmaStrawberrie","Galind_Halithel", "adran23452", "CreatureCreator101", "Nyao", "EpicoSama", "infinitypilot", "Complete_Regret7372", "Northern_Hermit", "Person_Maybe", "Soliloquis", "TUG310000", "Philotics", "ArtsArukana", "Rockastorm", "TheLaVeyan", "long_soi", "BBMsReddit", "Multiverse_Queen", "Daily_Scrolls_516", "Darkcasfire", "DoomlightTheSuperior", "TyrannoNinja", "Signal-World-5009", "shuikan", "Ok-Abbreviations-117", "Dyno_Coder", "IvanDFakkov", "Jyto-Radam", "MrCatCZ", "DrSecksy", "Alden_Is_Happy", "Apollo037", "Luftwagen", "pewdiewolf", "RedHood866", "LordWeaselton", "Eden6", "Yepuge", "Spader113", "VorgBardo", "technickr", "TheGeneral1899", "shinarit", "Trigger-red_cannibl", "RobertLiuTrujillo", "okeamu", "MissingAI", "captain_Natjo", "Consistent-Fee3666", "SiarX", "BeepBoopRainbow", "RowzeiChan", "everyteendrama", "WolfGuardia", "BulletBudgie", "HypedGymBro", "Nanduihir", "LenKagamine12", "AnemicIronman", "SeaborderCoast", "SqueakSquawk4", "TheElepehantInDeRoom", "Tackyinbention", "Raptorwolf_AML", "Particular_Fix1211", "scr33ner", "xxxnobitaxxx", "MrZorg58", "jackhammerrrrr", "factory_reset_button", "Neffthecloud", "Careful_Strategy_711", "kaburgadolmasi", "SaltedSam", "Physical-Pizza-5738", "LeviTexmo", "Atrarus", "Modstin", "Foreign-Swan4271", "lightyearshead", "Fair951", "Slbrownfella", "IdeLuis", "Wolfj13", "AthonianTunnelRat", "LyubomirIko", "Freddy994"];
 
 export function redditDownload(folderPath: string, subreddits: string, options: bdfrOptions) {
 	const { time, limit, skipExisting, additionalArguments, openFolder, nameFormat} = options;
@@ -46,8 +46,7 @@ export function redditDownload(folderPath: string, subreddits: string, options: 
 
 	const logPath = path.join(path.dirname(folderPath), "bdfr_logs");
 	if(openFolder) {
-		utils.createFolder(folderPath);
-		utils.execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${folderPath}"`, true)
+		utils.openImageFolder(folderPath);
 	}
 	utils.execShell(`py -m bdfr download "${folderPath}" \
 									--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} \
@@ -197,11 +196,9 @@ export async function cleanUnwanted() {
 		const files = fs.readdirSync(folder);
 		files.forEach((file) => {
 			let shouldDelete = false;
-			if(folder.indexOf("mobile") === -1 
+			if((folder.indexOf("desk") !== -1 )
 				&& (
-					file.toLowerCase().startsWith("animephonewallpapers") || 
-					file.toLowerCase().startsWith("mobilewallpaper") || 
-					file.toLowerCase().startsWith("verticalwallpapers")
+					file.toLowerCase().startsWith("vertical")
 				)) {
 					shouldDelete = true;
 				}
