@@ -167,6 +167,9 @@ export const subs: bdfrSection = {
 	marvel: {
 		subreddits: "ImaginaryMarvel"
 	},
+	pathfinder: {
+		subreddits: "ImaginaryGolarion"
+	},
 	pokemon: {
 		subreddits: "ImaginaryKanto"
 	},
