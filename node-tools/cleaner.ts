@@ -4,20 +4,21 @@ import { subs as otherSubs } from "./assets/other-subs";
 import { getDungeonFolders, getFinalFolders, getImaginaryFolders, getUpscaleFolders, knownDupesPath } from "./wallpapers";
 import path = require("path");
 
-export async function cleanImaginary() {
+export async function cleanImaginary(start: number) {
 	const subs = getImaginaryFolders();
 	let total = 0;
+	let found: foundItems = [];
 
-	// const index = subs.findIndex((value) => {return value.indexOf("colorscapes") > -1})
-
-	for (let i = 0; i < subs.length; i++) {
+	for (let i = start ?? 0; i < subs.length; i++) {
 		const subPath = subs[i];
+		const subName = path.basename(subPath);
 		utils.logBlue(`Cleaning (${i+1}/${subs.length}): ${subPath}`);
 
 		// deleteSimilar(subPath);
 		// utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
 		const results = deleteDuplicates(subPath).length/2;
 		total += Math.ceil(results);
+		found.push({subName, amount: Math.ceil(results)});
 		utils.logBlue(`Currently at ${total} total duplicate found`);
 		console.log("");
 		console.log("------------------------------------------------------------------------------------");
@@ -27,15 +28,22 @@ export async function cleanImaginary() {
 
 	utils.logGreen(`========================`);
 	utils.logGreen(`CLEANED ${total} DUPLICATES`);
+	console.log("");
+	utils.logGreen("SUMMARY:");
+	found.filter(el => el.amount > 0).sort((a, b) => {return a.amount - b.amount}).forEach((element) => {
+		utils.logGreen(`${element.subName}: ${element.amount} dupes`);
+	})
 	utils.logGreen(`========================`);
 }
 
-export async function cleanDungeon() {
+export async function cleanDungeon(start: number) {
 	const subs = getDungeonFolders();
 	let total = 0;
+	let found: foundItems = [];
 
-	for (let i = 0; i < subs.length; i++) {
+	for (let i = start ?? 0; i < subs.length; i++) {
 		const subPath = subs[i];
+		const subName = path.basename(subPath);
 		utils.logBlue(`Cleaning (${i+1}/${subs.length}): ${subPath}`);
 
 		const results1 = deleteSimilar(subPath).length/2;
@@ -43,6 +51,7 @@ export async function cleanDungeon() {
 		const results2 = deleteDuplicates(subPath).length/2;
 		total += Math.ceil(results1);
 		total += Math.ceil(results2);
+		found.push({subName, amount: Math.ceil(Math.ceil(results1) + Math.ceil(results2))});
 		utils.logBlue(`Currently at ${total} total duplicate found`);
 		console.log("");
 		console.log("------------------------------------------------------------------------------------");
@@ -52,6 +61,11 @@ export async function cleanDungeon() {
 
 	utils.logGreen(`========================`);
 	utils.logGreen(`CLEANED ${total} DUPLICATES`);
+	console.log("");
+	utils.logGreen("SUMMARY:");
+	found.filter(el => el.amount > 0).sort((a, b) => {return a.amount - b.amount}).forEach((element) => {
+		utils.logGreen(`${element.subName}: ${element.amount} dupes`);
+	})
 	utils.logGreen(`========================`);
 }
 
@@ -61,9 +75,11 @@ export async function cleanBeforeUpscale() {
 	const folders = getUpscaleFolders();
 	const knownDupesRaw = fs.readFileSync(knownDupesPath, "utf8");
 	const knownDupes = await JSON.parse(knownDupesRaw);
+	let found: foundItems = [];
 
 	for (let index = 0; index < folders.length; index++) {
 		const folder = folders[index];
+		const folderName = path.basename(folder);
 		if(!fs.existsSync(folder)) {
 			console.log(`${index+1}/${folders.length}: ${folder} doesn't exist`);
 			continue;
@@ -72,10 +88,17 @@ export async function cleanBeforeUpscale() {
 		foundDupes.map((dupe) => {knownDupes[dupe] = true});
 		const foundDupes2 = deleteSimilar(folder);
 		foundDupes2.map((dupe) => {knownDupes[dupe] = true});
+		const results = Math.ceil(foundDupes.length /2) + Math.ceil(foundDupes2.length /2);
+		found.push({subName: folderName, amount: Math.ceil(results)});
 		console.log(`Finished cleaning ${index+1}/${folders.length}`);
 	}
 	
 	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
+	console.log("");
+	utils.logGreen("SUMMARY:");
+	found.filter(el => el.amount > 0).sort((a, b) => {return a.amount - b.amount}).forEach((element) => {
+		utils.logGreen(`${element.subName}: ${element.amount} dupes`);
+	})
 	console.timeEnd(timerLabel);
 }
 
@@ -191,4 +214,10 @@ export function deleteSimilar(folderPath:string, video?: boolean) {
 	});
 	console.timeEnd(timerName);
 	return filesFound;
+}
+
+type foundItems = foundItem[];
+type foundItem = {
+	subName: string;
+	amount: number;
 }
