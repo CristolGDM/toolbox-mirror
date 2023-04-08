@@ -225,16 +225,14 @@ export async function sortAll() {
 }
 
 export async function downscaleDesktop() {
-	utils.openImageFolder(outputFinal);
 	await upscaler.downscaleFolder(outputToDownscale, outputFinal, 3840, 2160);
 }
 
 export async function downscaleMobile() {
-	utils.openImageFolder(outputMobile);
 	await upscaler.downscaleFolder(outputMobileToDownscale, outputMobile, 1080, 2400);
 }
 
-export async function downscale() {
+export function downscale() {
 	const timer = "downscaling took ";
 	console.time(timer);
 	utils.createFolder(outputFinal);
@@ -258,10 +256,12 @@ export async function downscale() {
 }
 
 export async function convertDesktop() {
+	utils.openImageFolder(outputToDownscale);
 	upscaler.convertFolderToJpg(wallpaperToConvert, outputToDownscale)
 }
 
 export async function convertMobile() {
+	utils.openImageFolder(outputMobileToDownscale);
 	upscaler.convertFolderToJpg(wallpaperToConvertMobile, outputMobileToDownscale)
 }
 export function convert() {
