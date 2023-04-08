@@ -8,8 +8,3 @@ other-subs*
 desktop.ini
 /csharp/DescriptionCleaning
 /homepage
-/node_modules
-/node-tools/node_modules
-/node-tools/compiled
-node-tools/assets/other-subs.js
-node-tools/assets/other-subs.ts
