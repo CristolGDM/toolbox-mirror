@@ -78,19 +78,19 @@ export function isFolder(path:string) {
 	return path.split(".").length === 1;
 }
 
-export function logBlue(stringToLog:string) {
+export function logBlue(stringToLog:any) {
 	console.log('\x1b[96m%s\x1b[0m', stringToLog);
 }
 
-export function logGreen(stringToLog:string) {
+export function logGreen(stringToLog:any) {
 	console.log('\x1b[92m%s\x1b[0m', stringToLog);
 }
 
-export function logYellow(stringToLog:string) {
+export function logYellow(stringToLog:any) {
 	console.log('\x1b[93m%s\x1b[0m', stringToLog);
 }
 
-export function logRed(stringToLog:string) {
+export function logRed(stringToLog:any) {
 	console.log('\x1b[91m%s\x1b[0m', stringToLog);
 }
 
