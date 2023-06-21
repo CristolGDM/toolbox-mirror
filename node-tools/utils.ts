@@ -25,7 +25,7 @@ export function fileExistsAnyExtension(file:string, folderPath:string) {
 	return files.indexOf(fileName) > -1;
 }
 
-export async function removesFilesFromAifExistsInB(pathA:string, pathB:string) {
+export async function removesFilesFromAifExistsInB(pathA:string, pathB:string, revert?: boolean) {
 	if(!fs.existsSync(pathA)) {
 		logYellow(`${pathA} doesn't exist`);
 		return;
@@ -44,7 +44,8 @@ export async function removesFilesFromAifExistsInB(pathA:string, pathB:string) {
 	let deletedFiles = 0;
 
 	await Promise.all(filesA.map(async (file, index) => {
-		if(filesB.indexOf(getFileNameWithoutExtension(file)) > -1) {
+		if((!revert && filesB.indexOf(getFileNameWithoutExtension(file)) > -1)
+		|| (revert && filesB.indexOf(getFileNameWithoutExtension(file)) === -1)) {
 			deleteFolder(path.join(pathA, file));
 			// logBlue(`Will delete ${path.join(pathA, file)}`);
 			deletedFiles++
