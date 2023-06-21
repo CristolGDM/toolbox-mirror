@@ -181,6 +181,11 @@ export async function upscalePSX(gameName:string) {
 	utils.deleteFolder(tempFolder);
 }
 
+export async function upscalePS2All() {
+	const games = fs.readdirSync("R:/PCSX2 1.7.0 dev/textures");
+	games.forEach(upscalePS2);
+}
+
 export async function upscalePS2(gameName: string) {
 	const folderLocation = "R:/PCSX2 1.7.0 dev";
 	const dumpFolder = `${folderLocation}/textures/${gameName}/dumps`;
