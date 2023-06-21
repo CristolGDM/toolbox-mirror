@@ -57,11 +57,13 @@ export function redditDownload(folderPath: string, subreddits: string, options: 
 									${additional} --verbose`)
 }
 
-function sectionDownload(section: bdfrSection, options: Omit<bdfrOptions, "time" | "skipExisting">) {
+function sectionDownload(section: bdfrSection, options: Omit<bdfrOptions, "time" | "skipExisting">, startAt?: string) {
 	const {limit} = options;
 	const categories = Object.keys(section);
 
-	for (let i = 0; i < categories.length; i++) {
+	const startIndex = startAt ? categories.findIndex((category) => {return category.toLowerCase().includes(startAt)}) : 0;
+
+	for (let i = startIndex; i < categories.length; i++) {
 		const category = categories[i];
 		const {folderPath, subreddits, limit: categoryLimit} = section[category];
 		
@@ -73,12 +75,12 @@ function sectionDownload(section: bdfrSection, options: Omit<bdfrOptions, "time"
 	}
 }
 
-export function imaginaryDownload() {
-	sectionDownload(imaginarySubs, {limit: 200, openFolder: true})
+export function imaginaryDownload(startAt?: string) {
+	sectionDownload(imaginarySubs, {limit: 200, openFolder: true}, startAt)
 };
 
-export function otherDownload() {
-	sectionDownload(otherSubs, {limit: 800, openFolder: false, nameFormat: "{SUBREDDIT}_{REDDITOR}_{TITLE}"});
+export function otherDownload(startAt?: string) {
+	sectionDownload(otherSubs, {limit: 800, openFolder: false, nameFormat: "{SUBREDDIT}_{REDDITOR}_{TITLE}"}, startAt);
 }
 
 export function dungeonDownload() {
