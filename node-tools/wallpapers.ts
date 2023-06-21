@@ -61,6 +61,22 @@ export function getFinalFolders() {
 	return [outputFinal, outputMobile];
 }
 
+export function cleanTempFolders() {
+	utils.removesFilesFromAifExistsInB(wallpaperToUpscale, wallpaperTemp, true);
+	utils.removesFilesFromAifExistsInB(wallpaperToConvert, wallpaperTemp, true);
+	utils.removesFilesFromAifExistsInB(wallpaperToConvert, wallpaperToUpscale, true);
+	utils.removesFilesFromAifExistsInB(outputToDownscale, wallpaperTemp, true);
+	utils.removesFilesFromAifExistsInB(outputToDownscale, wallpaperToUpscale, true);
+	utils.removesFilesFromAifExistsInB(outputToDownscale, wallpaperToConvert, true);
+	
+	utils.removesFilesFromAifExistsInB(wallpaperToUpscaleMobile, mobileTemp, true);
+	utils.removesFilesFromAifExistsInB(wallpaperToConvertMobile, mobileTemp, true);
+	utils.removesFilesFromAifExistsInB(wallpaperToConvertMobile, wallpaperToUpscaleMobile, true);
+	utils.removesFilesFromAifExistsInB(outputMobileToDownscale, mobileTemp, true);
+	utils.removesFilesFromAifExistsInB(outputMobileToDownscale, wallpaperToUpscaleMobile, true);
+	utils.removesFilesFromAifExistsInB(outputMobileToDownscale, wallpaperToConvertMobile, true);	
+}
+
 export function checkDuplicates() {
 	let duplicates = 0;
 	const finalFiles = utils.getListOfFilesWithoutExtension(outputFinal).concat(utils.getListOfFilesWithoutExtension(outputMobile));
