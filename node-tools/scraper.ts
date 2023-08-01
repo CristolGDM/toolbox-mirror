@@ -53,6 +53,7 @@ export function redditDownload(folderPath: string, subreddits: string, options: 
 									--folder-scheme "./" --file-scheme "${format}" \
 									${skippedDomains}	${skippedUsers} \
 									--log "${logPath}" \
+									--config ${path.join("L:", "Documents", "scripts", "nodejs-toolbox", "config.cfg")} \
 									--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" \
 									${additional} --verbose`)
 }
