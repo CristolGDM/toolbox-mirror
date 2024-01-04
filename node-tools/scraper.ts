@@ -44,12 +44,12 @@ export function redditDownload(folderPath: string, subreddits: string, options: 
 	if(openFolder) {
 		utils.openImageFolder(folderPath);
 	}
-	utils.execShell(`py -m bdfr download "${folderPath}" \
+	utils.execShell(`python -m bdfr download "${folderPath}" \
 									--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} \
 									--folder-scheme "./" --file-scheme "${format}" \
 									${skippedDomains}	${skippedUsers} \
 									--log "${logPath}" \
-									--config ${path.join("L:", "Documents", "scripts", "nodejs-toolbox", "config.cfg")} \
+									--config "${path.join("L:", "Documents", "scripts", "nodejs-toolbox", "myconfig.cfg")}" \
 									--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" \
 									${additional} --verbose`)
 }
