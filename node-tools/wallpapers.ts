@@ -201,7 +201,7 @@ export async function sortAll() {
 							console.log("=> desktop sized mobile wallpaper");
 							return;
 						}
-						if(width < 1300 || height < 500) {
+						if(width < 1600 || height < 800) {
 							console.log("=> too small, skipping");
 							return;
 						}
