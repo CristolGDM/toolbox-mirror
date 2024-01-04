@@ -7,3 +7,4 @@ utils = require("./utils.js");
 upscaler = require("./upscaler.js");
 scraper = require("./scraper.js");
 wallpapers = require("./wallpapers.js");
+stableDiffusion = require("./stable-diffusion.js");
