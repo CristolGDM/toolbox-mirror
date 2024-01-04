@@ -149,6 +149,7 @@ export function deleteDuplicates(folderPath:string) {
 	console.time(timerName);
 	const cleanedFolderPath = folderPath.replace(/\\/g, "/");
 	const logFile = path.join(cleanedFolderPath, "fdupelog.txt");
+	utils.deleteFolder(logFile);
 	utils.execShell(`C:\\cygwin64\\bin\\bash.exe --login -c 'fdupes --delete --noprompt --sameline "${cleanedFolderPath}" 2>&1 | tee -a "${logFile.replace(/\\/g, "/")}" '`)
 
 	const log = fs.readFileSync(logFile, 'utf8');
