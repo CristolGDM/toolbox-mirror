@@ -25,6 +25,24 @@ export function fileExistsAnyExtension(file:string, folderPath:string) {
 	return files.indexOf(fileName) > -1;
 }
 
+export function cleanOpenPoseFolders() {
+	const mypath = "L:/Pictures/projects/_controlnet shapes and poses/open-pose/_openpose";
+	const folders = fs.readdirSync(mypath);
+	folders.forEach((poseFolder) => {
+		const posefolderPath = path.join(mypath,poseFolder)
+		const subfolders: string[] = fs.readdirSync(posefolderPath);
+		subfolders.forEach((subfolder) => {
+			if(subfolder !== "json" && subfolder !== "OpenPose" && subfolder !== "img") return;
+			const subfolderPath = path.join(posefolderPath,subfolder);
+			const contents = fs.readdirSync(subfolderPath);
+			contents.forEach((file) => {
+				fs.copyFileSync(path.join(subfolderPath, file), path.join(posefolderPath, file));
+			})
+			deleteFolder(subfolderPath);
+		});
+	})
+}
+
 export async function removesFilesFromAifExistsInB(pathA:string, pathB:string, revert?: boolean) {
 	if(!fs.existsSync(pathA)) {
 		logYellow(`${pathA} doesn't exist`);
