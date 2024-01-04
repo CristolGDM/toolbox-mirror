@@ -83,7 +83,18 @@ export function createFolder(folderPath:string) {
 
 export function openImageFolder(folderPath: string) {
 	createFolder(folderPath);
-	execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${folderPath}"`, true)
+	execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${folderPath}"`, true);
+}
+
+export function randomImaginary() {
+	const imaginaryFolders = fs.readdirSync(ImaginaryPath).filter((folder) => {return folder.indexOf(".") === -1});
+	const chosenFolder = imaginaryFolders[Math.floor(Math.random()*imaginaryFolders.length)];
+	const chosenFolderPath = `${ImaginaryPath}/${chosenFolder}`;
+
+	const images = fs.readdirSync(chosenFolderPath);
+	const chosenImage = images[Math.floor(Math.random()*images.length)];
+	const chosenImagePath = `${chosenFolderPath}/${chosenImage}`
+	execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${chosenImagePath}"`, true);
 }
 
 export function deleteFolder(folderPath:string) {
