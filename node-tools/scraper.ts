@@ -201,10 +201,13 @@ export async function cleanUnwanted() {
 				)) {
 					shouldDelete = true;
 				}
-			else if(file.split("_").length > 1) {
+			if(file.split("_").length > 1) {
 				const begin = file.split("_")[0];
 				const shortName = file.replace(begin + "_", "");
 				shouldDelete = !!forbiddenUsers.find((user) => {return shortName.startsWith(user)});
+			}
+			if(file.toLowerCase().includes("[lfa]")) {
+				shouldDelete = true;
 			}
 
 			if(!shouldDelete) {
