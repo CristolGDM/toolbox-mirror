@@ -30,7 +30,7 @@ export async function cleanImaginary(start: number) {
 	utils.logGreen(`CLEANED ${total} DUPLICATES`);
 	console.log("");
 	utils.logGreen("SUMMARY:");
-	found.filter(el => el.amount > 0).sort((a, b) => {return a.amount - b.amount}).forEach((element) => {
+	found.filter(el => el.amount > 0).sort((a, b) => {return b.amount - a.amount}).forEach((element) => {
 		utils.logGreen(`${element.subName}: ${element.amount} dupes`);
 	})
 	utils.logGreen(`========================`);
@@ -63,7 +63,7 @@ export async function cleanDungeon(start: number) {
 	utils.logGreen(`CLEANED ${total} DUPLICATES`);
 	console.log("");
 	utils.logGreen("SUMMARY:");
-	found.filter(el => el.amount > 0).sort((a, b) => {return a.amount - b.amount}).forEach((element) => {
+	found.filter(el => el.amount > 0).sort((a, b) => {return b.amount - a.amount}).forEach((element) => {
 		utils.logGreen(`${element.subName}: ${element.amount} dupes`);
 	})
 	utils.logGreen(`========================`);
@@ -96,7 +96,7 @@ export async function cleanBeforeUpscale() {
 	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 	console.log("");
 	utils.logGreen("SUMMARY:");
-	found.filter(el => el.amount > 0).sort((a, b) => {return a.amount - b.amount}).forEach((element) => {
+	found.filter(el => el.amount > 0).sort((a, b) => {return b.amount - a.amount}).forEach((element) => {
 		utils.logGreen(`${element.subName}: ${element.amount} dupes`);
 	})
 	console.timeEnd(timerLabel);
