@@ -46,12 +46,12 @@ export async function cleanDungeon(start: number) {
 		const subName = path.basename(subPath);
 		utils.logBlue(`Cleaning (${i+1}/${subs.length}): ${subPath}`);
 
-		const results1 = deleteSimilar(subPath).length/2;
-		utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
+		// const results1 = deleteSimilar(subPath).length/2;
+		// utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
 		const results2 = deleteDuplicates(subPath).length/2;
-		total += Math.ceil(results1);
+		// total += Math.ceil(results1);
 		total += Math.ceil(results2);
-		found.push({subName, amount: Math.ceil(Math.ceil(results1) + Math.ceil(results2))});
+		found.push({subName, amount: Math.ceil(results2)});
 		utils.logBlue(`Currently at ${total} total duplicate found`);
 		console.log("");
 		console.log("------------------------------------------------------------------------------------");
@@ -137,8 +137,8 @@ export function cleanOthers() {
 			continue;
 		}
 		deleteDuplicates(folder);
-		deleteSimilar(folder);
-		deleteSimilar(folder, true);
+		// deleteSimilar(folder);
+		// deleteSimilar(folder, true);
 		console.log(`Finished cleaning ${index+1}/${folders.length}`)
 	}
 }
