@@ -4,6 +4,7 @@ bdfr_logs*
 bdfr_logs.*
 node_modules
 node-tools/compiled
+node-tools/node_modules
 other-subs*
 desktop.ini
 /csharp/DescriptionCleaning
