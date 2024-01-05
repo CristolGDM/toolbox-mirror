@@ -1,23 +1,28 @@
 import * as fs from "fs";
+import { getFileNameWithoutExtension, logGreen, separator } from "./utils";
+import axios from "axios";
 const stableDiffusionUrl = "http://127.0.0.1:7860";
 
-async function makeRequestToAPI(method: "GET" | "POST", endpoint: string, payload?: unknown) {
-  const body = method === "POST" ? {
-    body: JSON.stringify(payload)
-  } : {};
-  const response = await fetch((stableDiffusionUrl + endpoint).replace("//", "/"), {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      ...body
-    })
+const source = "L:/Pictures/upscale-test/source-small";
+const destination = "L:/Pictures/upscale-test/destination";
+const destinationMulti = "L:/Pictures/upscale-test/destination_multi";
 
-  // console.log(response);
-  return await response.json();
+axios.defaults.baseURL = 'http://127.0.0.1:7860';
+
+async function makeRequestToAPI(method: "GET" | "POST", endpoint: string, payload?: unknown) {
+  let response;
+
+  if(method === "GET") {
+    response = await axios.get(endpoint)
+  }
+  if(method === "POST") {
+    response = await axios.post(endpoint, payload, {timeout: 60*1000});
+  }
+
+  return await response.data;
 }
 
-async function getUpscalers() {
+export async function getUpscalers() {
   const response = await makeRequestToAPI("GET", "/sdapi/v1/upscalers");
   return response
 }
