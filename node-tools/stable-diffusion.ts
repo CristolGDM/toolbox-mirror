@@ -1,8 +1,10 @@
 import * as fs from "fs";
 import { getFileNameWithoutExtension, logBlue, logGreen, oneHour, separator } from "./utils";
 import axios from "axios";
+import * as sharp from "sharp";
 
 const source = "L:/Pictures/upscale-test/source";
+const sourceSmall = "L:/Pictures/upscale-test/source-small";
 const destination = "L:/Pictures/upscale-test/destination";
 
 axios.defaults.baseURL = 'http://127.0.0.1:7860';
@@ -47,10 +49,18 @@ export async function upscaleFolder(model: Upscaler, suffix: string) {
     })
   }
   const response:BatchUpscaleResponse = await makeRequestToAPI("POST", "/sdapi/v1/extra-batch-images", payload);
-  response.images.forEach((image, index) => {
+
+  for (let index = 0; index < response.images.length; index++) {
+    const image = response.images[index];
     const imageName = getFileNameWithoutExtension(images[index]);
-    fs.writeFileSync(`${destination}/${imageName}_${suffix}.png`, image, {encoding: 'base64'});
-  })
+    const imgBuffer = Buffer.from(image.split(';base64,').pop(), 'base64');
+    await sharp(imgBuffer)
+      .toFormat("jpeg")
+      .jpeg({
+        force: true
+      })
+      .toFile(`${destination}/${imageName}_${suffix}.jpg`)
+    }
   return response;
 }
 
@@ -59,7 +69,7 @@ export async function testModels() {
   fs.mkdirSync(destination);
   const images = fs.readdirSync(source);
   for(const image of images) {
-    fs.writeFileSync(`${destination}/${image}`, image);
+    fs.writeFileSync(`${destination}/${image}`, fs.readFileSync(`${source}/${image}`));
   }
   const upscalers: {model: string, suffix: string}[] = [
     {model: '4x_foolhardy_Remacri', suffix: "remacri"},
