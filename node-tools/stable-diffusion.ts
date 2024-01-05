@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { getFileNameWithoutExtension, logBlue, logGreen, logYellow, oneHour, separator } from "./utils";
 import axios from "axios";
 import * as sharp from "sharp";
-import path = require("path");
+import * as cliProgress from "cli-progress";
 
 // const defaultSource = "L:/Pictures/upscale-test/source";
 const defaultSource = "L:/Pictures/upscale-test/source-small";
@@ -57,9 +57,16 @@ async function singleUpscale(model: Upscaler, imagePath: string) {
 
 async function upscaleFolder(source: string, destination: string, model: Upscaler, suffix?: string) {
   const images = fs.readdirSync(source);
+  const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+  progressBar.start(images.length, 0);
+  const done = [];
   for (let index = 0; index < images.length; index++) {
     const image = images[index];
-    logYellow(`Upscaling ${image} (${index+1}/${images.length})`);
+    console.clear();
+    done.forEach((doneImage) => {logYellow(`Upscaling ${doneImage}`)});
+    console.log("");
+    progressBar.update(index);
+    console.log("");
     const upscaledImage = await singleUpscale(model, `${source}/${image}`);
     const imageName = getFileNameWithoutExtension(image);
     const imgBuffer = Buffer.from(upscaledImage.split(';base64,').pop(), 'base64');
@@ -68,8 +75,11 @@ async function upscaleFolder(source: string, destination: string, model: Upscale
       .jpeg({
         force: true
       })
-      .toFile(`${destination}/${imageName}${suffix ? "_"+suffix : ""}.jpg`)
+      .toFile(`${destination}/${imageName}${suffix ? "_"+suffix : ""}.jpg`);
+    done.push(image);
   }
+  progressBar.update(images.length);
+  progressBar.stop();
 }
 
 async function batchUpscale(model: Upscaler, suffix: string, source: string, destination: string) {

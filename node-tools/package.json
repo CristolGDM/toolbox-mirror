@@ -13,8 +13,10 @@
     "url-exist": "^3.0.0"
   },
   "devDependencies": {
+    "@types/cli-progress": "^3.11.5",
     "@types/sharp": "^0.31.0",
-    "axios": "^1.6.4"
+    "axios": "^1.6.4",
+    "cli-progress": "^3.12.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
