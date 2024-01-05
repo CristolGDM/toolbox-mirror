@@ -3,6 +3,7 @@ import { getFileNameWithoutExtension, logBlue, logGreen, logYellow, oneHour, sep
 import axios from "axios";
 import * as sharp from "sharp";
 import * as cliProgress from "cli-progress";
+import * as colors from "ansi-colors";
 
 // const defaultSource = "L:/Pictures/upscale-test/source";
 const defaultSource = "L:/Pictures/upscale-test/source-small";
@@ -57,16 +58,18 @@ async function singleUpscale(model: Upscaler, imagePath: string) {
 
 async function upscaleFolder(source: string, destination: string, model: Upscaler, suffix?: string) {
   const images = fs.readdirSync(source);
-  const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
-  progressBar.start(images.length, 0);
+  const startTime = new Date();
+  const progressBar = new cliProgress.SingleBar({
+    format: 'CLI Progress |' + colors.cyanBright('{bar}') + '| {percentage}% | {value}/{total} | Speed: {speed}s/img | ETA: {eta_formatted}',
+    barCompleteChar: '\u2588',
+    barIncompleteChar: '\u2591',
+    hideCursor: true
+  });
+  console.clear();
+  progressBar.start(images.length, 0, {speed: "N/A"});
   const done = [];
   for (let index = 0; index < images.length; index++) {
     const image = images[index];
-    console.clear();
-    done.forEach((doneImage) => {logYellow(`Upscaling ${doneImage}`)});
-    console.log("");
-    progressBar.update(index);
-    console.log("");
     const upscaledImage = await singleUpscale(model, `${source}/${image}`);
     const imageName = getFileNameWithoutExtension(image);
     const imgBuffer = Buffer.from(upscaledImage.split(';base64,').pop(), 'base64');
@@ -77,6 +80,14 @@ async function upscaleFolder(source: string, destination: string, model: Upscale
       })
       .toFile(`${destination}/${imageName}${suffix ? "_"+suffix : ""}.jpg`);
     done.push(image);
+    
+    const updatedTime = new Date().valueOf() - startTime.valueOf();
+    const speed = (updatedTime / (1000*(index+1))).toFixed(2);
+    console.clear();
+    done.forEach((doneImage) => {logGreen(`Upscaled ${doneImage}`)});
+    console.log("");
+    progressBar.update(index+1, {speed: speed});
+    console.log("");
   }
   progressBar.update(images.length);
   progressBar.stop();
