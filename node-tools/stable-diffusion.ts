@@ -1,11 +1,9 @@
 import * as fs from "fs";
-import { getFileNameWithoutExtension, logGreen, separator } from "./utils";
+import { getFileNameWithoutExtension, logBlue, logGreen, oneHour, separator } from "./utils";
 import axios from "axios";
-const stableDiffusionUrl = "http://127.0.0.1:7860";
 
-const source = "L:/Pictures/upscale-test/source-small";
+const source = "L:/Pictures/upscale-test/source";
 const destination = "L:/Pictures/upscale-test/destination";
-const destinationMulti = "L:/Pictures/upscale-test/destination_multi";
 
 axios.defaults.baseURL = 'http://127.0.0.1:7860';
 
@@ -16,7 +14,7 @@ async function makeRequestToAPI(method: "GET" | "POST", endpoint: string, payloa
     response = await axios.get(endpoint)
   }
   if(method === "POST") {
-    response = await axios.post(endpoint, payload, {timeout: 60*1000});
+    response = await axios.post(endpoint, payload, {timeout: 12*oneHour});
   }
 
   return await response.data;
@@ -27,14 +25,10 @@ export async function getUpscalers() {
   return response
 }
 
-export async function upscaleFolder() {
-  const source = "L:/Pictures/upscale-test/source-small";
-  const destination = "L:/Pictures/upscale-test/destination";
-  fs.rmSync(destination, { recursive: true, force: true });
-  fs.mkdirSync(destination);
+export async function upscaleFolder(model: Upscaler, suffix: string) {
   const images = fs.readdirSync(source);
 
-  const payload: batchUpscalePayload = {
+  const payload: BatchUpscalePayload = {
     resize_mode: 1,
     show_extras_results: true,
     gfpgan_visibility: 0,
@@ -43,9 +37,7 @@ export async function upscaleFolder() {
     upscaling_crop: false,
     upscaling_resize_w: 3840,
     upscaling_resize_h: 2160,
-    upscaler_1: "R-ESRGAN 4x+",
-    upscaler_2: "4x_foolhardy_Remacri",
-    extras_upscaler_2_visibility: 0.5,
+    ...model,
     upscale_first: false,
     imageList: images.map((imageName):Image => {
       return {
@@ -54,13 +46,51 @@ export async function upscaleFolder() {
       }
     })
   }
-  const response:batchUpscaleResponse = await makeRequestToAPI("POST", "/sdapi/v1/extra-batch-images", payload);
+  const response:BatchUpscaleResponse = await makeRequestToAPI("POST", "/sdapi/v1/extra-batch-images", payload);
   response.images.forEach((image, index) => {
-    fs.writeFileSync(`${destination}/${images[index]}`, image, {encoding: 'base64'});
+    const imageName = getFileNameWithoutExtension(images[index]);
+    fs.writeFileSync(`${destination}/${imageName}_${suffix}.png`, image, {encoding: 'base64'});
   })
+  return response;
 }
 
-type batchUpscalePayload = {
+export async function testModels() {
+  fs.rmSync(destination, { recursive: true, force: true });
+  fs.mkdirSync(destination);
+  const images = fs.readdirSync(source);
+  for(const image of images) {
+    fs.writeFileSync(`${destination}/${image}`, image);
+  }
+  const upscalers: {model: string, suffix: string}[] = [
+    {model: '4x_foolhardy_Remacri', suffix: "remacri"},
+    {model: 'ESRGAN_4x', suffix: "esrgan"},
+    {model: 'R-ESRGAN 4x+', suffix: "rEsrgan"},
+    {model: 'SwinIR_4x', suffix: "swinIR"},
+  ];
+  // single tests
+  for (const upscaler of upscalers) {
+    logBlue("Running upscale for " + upscaler.model);
+    await upscaleFolder({upscaler_1: upscaler.model}, upscaler.suffix);
+  }
+  logBlue(separator(16));
+  logBlue("Finished single upscale");
+  logBlue(separator(16));
+
+  for (const mainUpscaler of upscalers) {
+    for (const secondUpscaler of upscalers) {
+      if(secondUpscaler.model === mainUpscaler.model) continue;
+      const suffix = "zzz-"+mainUpscaler.suffix + "+" + secondUpscaler.suffix;
+      logBlue("Running upscale for " + mainUpscaler.model + "/" + secondUpscaler.model);
+      await upscaleFolder({upscaler_1: mainUpscaler.model, upscaler_2: secondUpscaler.model, extras_upscaler_2_visibility: 0.5}, suffix);
+    }
+  }
+  logGreen(separator(16));
+  logGreen("Finished upscale");
+  logGreen(separator(16));
+  return;
+}
+
+type BatchUpscalePayload = Upscaler & {
   "resize_mode": 0 | 1, //Sets the resize mode: 0 to upscale by upscaling_resize amount, 1 to upscale up to upscaling_resize_h x upscaling_resize_w.
   "show_extras_results": boolean, //Should the backend return the generated image?
   "gfpgan_visibility": number,
@@ -70,11 +100,14 @@ type batchUpscalePayload = {
   "upscaling_resize_w"?: number, //Target width for the upscaler to hit. Only used when resize_mode=1.
   "upscaling_resize_h"?: number, //Target height for the upscaler to hit. Only used when resize_mode=1.
   "upscaling_crop": boolean, //Should the upscaler crop the image to fit in the chosen size?
-  "upscaler_1": string, //The name of the main upscaler to use
-  "upscaler_2": string, //The name of the secondary upscaler to use
-  "extras_upscaler_2_visibility": number,
   "upscale_first": false, //Should the upscaler run before restoring faces?
   "imageList": Image[] //List of images to work on. Must be Base64 strings
+}
+
+type Upscaler = {
+  "upscaler_1": string, //The name of the main upscaler to use
+  "upscaler_2"?: string, //The name of the secondary upscaler to use
+  "extras_upscaler_2_visibility"?: number,
 }
 
 type Image = {
@@ -82,7 +115,7 @@ type Image = {
   name:	string; //File name  
 }
 
-type batchUpscaleResponse = {
+type BatchUpscaleResponse = {
   html_info: string;
   images: string[];
 }
