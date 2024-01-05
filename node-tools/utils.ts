@@ -8,6 +8,10 @@ export const NASPath = "//MOOMINLIBRARY";
 export const PicturesPath = `${NASPath}/pictures`;
 export const ImaginaryPath = `${PicturesPath}/imaginary-network`;
 
+export const oneSecond = 1000;
+export const oneMinute = 60*oneSecond;
+export const oneHour = 60*oneMinute;
+
 export function getFileNameWithoutExtension(fileName:string) {
 	const nameSplit = fileName.split(".");
 	nameSplit.pop();
