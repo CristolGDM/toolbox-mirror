@@ -148,13 +148,13 @@ export function yellowString(stringToLog:string) {
 	return `\x1b[93m${stringToLog}\x1b[0m`
 }
 
-export function execShell(command:string, isAsync?:boolean) {
+export function execShell(command:string, isAsync?:boolean, customString?: string) {
 	logLine();
 	logYellow(" " + separator(30));
 	logLine();
 	logYellow(" executing following command:")
 	logLine();
-	logBlue("" + command);
+	logBlue("" + (customString ?? command));
 	logLine();
 	logYellow(" " + separator(30));
 	logLine();
