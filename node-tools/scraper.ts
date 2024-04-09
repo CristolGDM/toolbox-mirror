@@ -44,14 +44,17 @@ export function redditDownload(folderPath: string, subreddits: string, options: 
 	if(openFolder) {
 		utils.openImageFolder(folderPath);
 	}
-	utils.execShell(`python -m bdfr download "${folderPath}" \
-									--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} \
-									--folder-scheme "./" --file-scheme "${format}" \
-									${skippedDomains}	${skippedUsers} \
-									--log "${logPath}" \
-									--config "${path.join("L:", "Documents", "scripts", "nodejs-toolbox", "myconfig.cfg")}" \
-									--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" \
-									${additional} --verbose`)
+
+	const command = `python -m bdfr download "${folderPath}" \
+	--subreddit "${subreddits}" --sort top --no-dupes ${skipExistingParam} \
+	--folder-scheme "./" --file-scheme "${format}" \
+	${skippedDomains}	${skippedUsers} \
+	--log "${logPath}" \
+	--config "${path.join("L:", "Documents", "scripts", "nodejs-toolbox", "myconfig.cfg")}" \
+	--max-wait-time 30 --time "${usedTime}" --limit ${usedLimit} --skip "txt" \
+	${additional} --verbose`;
+
+	utils.execShell(command,false,command.replace(skippedUsers, ""));
 }
 
 function sectionDownload(section: bdfrSection, options: Omit<bdfrOptions, "time" | "skipExisting">, startAt?: string) {
