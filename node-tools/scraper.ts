@@ -227,14 +227,6 @@ export async function cleanUnwanted() {
 	utils.logBlue(`Deleted ${found} not so pretty pictures`);
 }
 
-function test() {
-	const testFolder = "E:/Pictures/temp";
-	const dupes = deleteDuplicates(testFolder);
-	utils.logYellow("Found this:");
-	console.log(dupes);
-	return;
-}
-
 interface bdfrOptions {
 	time?: keyof typeof validTimeValues,
 	limit?: number,
