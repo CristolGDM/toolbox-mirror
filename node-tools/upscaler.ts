@@ -2,8 +2,6 @@ import * as fs from "fs";
 import * as sharp from "sharp";
 import * as path from "path";
 import * as utils from "./utils";
-import { desktopHeight, desktopWidth, filterBigEnough, mobileHeight, mobileWidth } from "./wallpapers";
-import { upscaleFolderSD } from "./stable-diffusion";
 
 export const models = {
 	nickelback:  "4x_NickelbackFS_72000_G.pth",
