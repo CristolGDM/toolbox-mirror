@@ -3,10 +3,13 @@ import * as sharp from "sharp";
 import * as path from "path";
 import * as utils from "./utils";
 import * as upscaler from "./upscaler";
+import * as cliProgress from "cli-progress";
+import * as colors from "ansi-colors";
 
 import {subs as imaginarySubs} from "./assets/imaginary-subs";
 import {subs as dungeonSubs} from "./assets/dungeon-subs";
-import { NASPath } from "./utils";
+import { NASPath, logGreen, separator, createFolder } from "./utils";
+import { upscaleFolderSD, upscaleFolderSDOneByOne } from "./stable-diffusion";
 
 const localPicturesPath = "L:/Pictures/wp-up";
 
@@ -19,115 +22,91 @@ const outputMobile = `${NASPath}/pictures/wallpapers-upscaled-mobile`;
 const wallpaperToUpscale = upscaler.getTempScaleFolderName(wallpaperTemp);
 const wallpaperToUpscaleMobile = upscaler.getTempScaleFolderName(mobileTemp);
 
-const wallpaperToConvert = `${localPicturesPath}/desk-toconvert`;
-const wallpaperToConvertMobile = `${localPicturesPath}/mob-toconvert`;
+const outputSemiFinal = `${localPicturesPath}/desk-totransfer`;
+const outputMobileSemiFinal = `${localPicturesPath}/mob-totransfer`;
 
-const outputToDownscale = `${localPicturesPath}/desk-todown`;
-const outputMobileToDownscale = `${localPicturesPath}/mob-todown`;
-
-const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi"];
+const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi", "gifv"];
 
 export const knownDupesPath = `${NASPath}/pictures/knownDupes.json`;
 
+export const desktopWidth = 3840;
+export const desktopHeight = 2160;
+export const mobileWidth = 1080;
+export const mobileHeight = 2400;
 
 function fileAlreadyExists(fileName: string, files: string[]) {
 	const fileNameCleaned = utils.getFileNameWithoutExtension(fileName);
 	return files.indexOf(fileNameCleaned) > -1;
 }
 
-export function getImaginaryFolders() {
-	const subNames = Object.keys(imaginarySubs);
+export async function upscale() {
+	/* Create necessary folders */
+	[wallpaperTemp, outputSemiFinal, wallpaperToUpscale, mobileTemp, outputMobileSemiFinal, wallpaperToUpscaleMobile].forEach((folder) => {return createFolder(folder)});
 
-	return subNames.map((subName) => {
-		const sub = imaginarySubs[subName];
-		return sub.folderPath ?? path.join(utils.ImaginaryPath, subName)
-	}).sort();
-}
-
-export function getDungeonFolders() {
-	const subNames = Object.keys(dungeonSubs);
-
-	return subNames.map((subName) => {
-		const sub = dungeonSubs[subName];
-		return sub.folderPath;
-	});
-}
-
-export function getUpscaleFolders() {
-	return [wallpaperTemp, mobileTemp, wallpaperToUpscale, wallpaperToUpscaleMobile, wallpaperToConvert, wallpaperToConvertMobile, outputToDownscale, outputMobileToDownscale];
-}
-
-export function getFinalFolders() {
-	return [outputFinal, outputMobile];
-}
-
-export function cleanTempFolders() {
-	utils.removesFilesFromAifExistsInB(wallpaperToUpscale, wallpaperTemp, true);
-	utils.removesFilesFromAifExistsInB(wallpaperToConvert, wallpaperTemp, true);
-	utils.removesFilesFromAifExistsInB(wallpaperToConvert, wallpaperToUpscale, true);
-	utils.removesFilesFromAifExistsInB(outputToDownscale, wallpaperTemp, true);
-	utils.removesFilesFromAifExistsInB(outputToDownscale, wallpaperToUpscale, true);
-	utils.removesFilesFromAifExistsInB(outputToDownscale, wallpaperToConvert, true);
+	/* Filter big enough images */
+	await filterBigEnough(wallpaperTemp, outputSemiFinal, wallpaperToUpscale, desktopWidth, desktopHeight);
+	await filterBigEnough(mobileTemp, outputMobileSemiFinal, wallpaperToUpscaleMobile, mobileWidth, mobileHeight);
 	
-	utils.removesFilesFromAifExistsInB(wallpaperToUpscaleMobile, mobileTemp, true);
-	utils.removesFilesFromAifExistsInB(wallpaperToConvertMobile, mobileTemp, true);
-	utils.removesFilesFromAifExistsInB(wallpaperToConvertMobile, wallpaperToUpscaleMobile, true);
-	utils.removesFilesFromAifExistsInB(outputMobileToDownscale, mobileTemp, true);
-	utils.removesFilesFromAifExistsInB(outputMobileToDownscale, wallpaperToUpscaleMobile, true);
-	utils.removesFilesFromAifExistsInB(outputMobileToDownscale, wallpaperToConvertMobile, true);	
-}
-
-export function checkDuplicates() {
-	let duplicates = 0;
-	const finalFiles = utils.getListOfFilesWithoutExtension(outputFinal).concat(utils.getListOfFilesWithoutExtension(outputMobile));
-	const tempFiles = utils.getListOfFilesWithoutExtension(wallpaperTemp).concat(utils.getListOfFilesWithoutExtension(mobileTemp));
+  logGreen(separator(16));
+  logGreen("Finished sorting");
+  logGreen(separator(16));
 	
-	for (let i = 0; i < tempFiles.length; i++) {
-		const element = tempFiles[i];
-		if(finalFiles.indexOf(element) > -1) {
-			duplicates++
+	/* Upscale small ones */
+	const upscaler = {upscaler_1: '4x_foolhardy_Remacri'};
+	await upscaleFolderSDOneByOne(wallpaperToUpscale, outputSemiFinal, upscaler,desktopWidth,desktopHeight);
+	await upscaleFolderSDOneByOne(wallpaperToUpscaleMobile, outputMobileSemiFinal, upscaler,mobileWidth,mobileHeight);
+  logGreen(separator(16));
+  logGreen("Finished upscale");
+  logGreen(separator(16));
+};
+
+export async function filterBigEnough(sourceFolder: string, folderIfBig: string, folderIfSmall: string, targetWidth: number, targetHeight: number) {
+	createFolder(folderIfBig);
+	createFolder(folderIfSmall);
+	const images = fs.readdirSync(sourceFolder);
+	const progressBar = new cliProgress.SingleBar({
+    format: 'CLI Progress |' + colors.cyanBright('{bar}') + '| {percentage}% | {value}/{total} | ETA: {eta_formatted}',
+    barCompleteChar: '\u2588',
+    barIncompleteChar: '\u2591',
+    hideCursor: true,
+    etaBuffer: 50,
+  });
+	const done: {name: string, isBig?: boolean, isExists?: boolean}[] = [];
+  progressBar.start(images.length, 0);
+	console.log("");
+
+	for (let index = 0; index < images.length; index++) {
+		const image = images[index];
+		const imagePath = path.join(sourceFolder, image);
+		const logPrefix = `${index+1}/${images.length}: ${image}`;
+		if(fs.existsSync(path.join(folderIfSmall, image)) || fs.existsSync(path.join(folderIfBig, utils.getFileNameWithoutExtension(image)+".jpg"))) {
+			done.push({name: image, isExists: true});
+			utils.logRed(`${logPrefix} => already exists`);
 		}
+		else {
+			utils.logYellow(`${logPrefix} => need to upscale`);
+			const {width, height} = await sharp(imagePath).metadata();
+			if(width < targetWidth || height < targetHeight) {
+				done.push({name: image, isBig: false});
+				fs.writeFileSync(path.join(folderIfSmall, image), fs.readFileSync(imagePath));
+			}
+			else {
+				done.push({name: image, isBig: true});
+				utils.logBlue(`${logPrefix} => already big enough`);
+				await sharp(imagePath)
+					.toFormat("jpeg")
+					.jpeg({
+						force: true,
+					})
+					.resize(targetWidth, targetHeight, {fit: "outside"})
+					.toFile(path.join(folderIfBig, utils.getFileNameWithoutExtension(image)+".jpg"))
+			}
+		}
+    progressBar.update(index+1);
 	}
-
-	console.log(`Found ${duplicates} dupes`);
-};
-
-export async function upscaleDesktop() {
-	utils.openImageFolder(wallpaperToConvert);
-	await upscaler.upscaleFolder(wallpaperTemp, upscaler.models.uniscaleRestore, wallpaperToConvert, 3840);
-	utils.logBlue("________");
-	utils.logBlue("Finished upscaling desktop");
+  progressBar.update(images.length);
+	console.log("");
 }
-
-export async function upscaleMobile() {
-	utils.openImageFolder(wallpaperToConvertMobile);
-	await upscaler.upscaleFolder(mobileTemp, upscaler.models.lollypop, wallpaperToConvertMobile, null, 2400);
-	utils.logBlue("________");
-	utils.logBlue("Finished upscaling mobile");
-}
-
-export function upscale() {
-	upscaleDesktop().then(() => {
-		utils.logLine();
-		utils.logGreen(utils.separator(30));
-		utils.logGreen("Finished upscaling desktop folder");
-		utils.logGreen(utils.separator(30));
-		utils.logLine();
-		upscaleMobile().then(() => {
-			utils.logLine();
-			utils.logGreen(utils.separator(30));
-			utils.logGreen("Finished upscaling mobile folder");
-			utils.logGreen(utils.separator(30));
-			utils.logLine();
-			utils.logLine();
-
-			utils.logBlue(utils.separator(30));
-			utils.logBlue(utils.separator(30));
-			utils.logBlue(utils.separator(30));
-			utils.logBlue("Finished upscaling");
-		});
-	})
-};
 
 export async function sortAll() {
 	const timerLabel = "sortAll() current time: "
@@ -240,65 +219,37 @@ export async function sortAll() {
 	return;
 }
 
-export async function downscaleDesktop() {
-	await upscaler.downscaleFolder(outputToDownscale, outputFinal, 3840, 2160);
+/* GET FOLDERS */
+
+export function getImaginaryFolders() {
+	const subNames = Object.keys(imaginarySubs);
+
+	return subNames.map((subName) => {
+		const sub = imaginarySubs[subName];
+		return sub.folderPath ?? path.join(utils.ImaginaryPath, subName)
+	}).sort();
 }
 
-export async function downscaleMobile() {
-	await upscaler.downscaleFolder(outputMobileToDownscale, outputMobile, 1080, 2400);
-}
+export function getDungeonFolders() {
+	const subNames = Object.keys(dungeonSubs);
 
-export function downscale() {
-	const timer = "downscaling took ";
-	console.time(timer);
-	utils.createFolder(outputFinal);
-	utils.createFolder(outputMobile);
-	downscaleDesktop().then(async () => {
-		console.timeLog(timer);
-		utils.logLine();
-		utils.logGreen(utils.separator(30));
-		utils.logGreen("Finished downscaling desktop folder");
-		utils.logGreen(utils.separator(30));
-		utils.logLine();
-		downscaleMobile().then(() => {
-			console.timeLog(timer);
-			utils.logLine();
-			utils.logGreen(utils.separator(30));
-			utils.logGreen("Finished downscaling mobile folder");
-			utils.logGreen(utils.separator(30));
-			utils.logLine();
-		});
+	return subNames.map((subName) => {
+		const sub = dungeonSubs[subName];
+		return sub.folderPath;
 	});
 }
 
-export async function convertDesktop() {
-	utils.openImageFolder(outputToDownscale);
-	upscaler.convertFolderToJpg(wallpaperToConvert, outputToDownscale)
+export function getUpscaleFolders() {
+	return [wallpaperTemp, mobileTemp, wallpaperToUpscale, wallpaperToUpscaleMobile, outputSemiFinal, outputMobileSemiFinal];
 }
 
-export async function convertMobile() {
-	utils.openImageFolder(outputMobileToDownscale);
-	upscaler.convertFolderToJpg(wallpaperToConvertMobile, outputMobileToDownscale)
+export function getFinalFolders() {
+	return [outputFinal, outputMobile];
 }
-export function convert() {
-	const timer = "converting took ";
-	console.time(timer);
-	utils.createFolder(outputToDownscale);
-	utils.createFolder(outputMobileToDownscale);
-	convertDesktop().then(() => {
-		console.timeLog(timer);
-		utils.logLine();
-		utils.logGreen(utils.separator(30));
-		utils.logGreen("Finished converting desktop folder");
-		utils.logGreen(utils.separator(30));
-		utils.logLine();
-		convertMobile().then(() => {
-			console.timeLog(timer);
-			utils.logLine();
-			utils.logGreen(utils.separator(30));
-			utils.logGreen("Finished converting mobile folder");
-			utils.logGreen(utils.separator(30));
-			utils.logLine();
-		})
-	})
+
+export function sendUpscaledToLibrary() {
+	utils.createFolder(outputFinal);
+	utils.createFolder(outputMobile);
+	utils.execShell(`rclone sync "${outputSemiFinal}" "${outputFinal}" --progress --transfers=20`);
+	utils.execShell(`rclone sync "${outputMobileSemiFinal}" "${outputMobile}" --progress --transfers=20`);
 }

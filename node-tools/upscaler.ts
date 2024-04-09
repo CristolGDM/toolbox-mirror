@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as sharp from "sharp";
 import * as path from "path";
 import * as utils from "./utils";
+import { desktopHeight, desktopWidth, filterBigEnough, mobileHeight, mobileWidth } from "./wallpapers";
+import { upscaleFolderSD } from "./stable-diffusion";
 
 export const models = {
 	nickelback:  "4x_NickelbackFS_72000_G.pth",
@@ -28,78 +30,11 @@ export function getTempScaleFolderName(originalFolderName: string) {
 	return `${originalFolderName}-toscale`;
 }
 
-export async function upscaleFolder(inputPath:string, modelName: ModelName, outputPath: string, minWidth: number, minHeight?:number) {
-	if(inputPath.endsWith("-toscale") || inputPath.endsWith("-upscaled")) {
-		return;
-	}
-	utils.logLine();
-	const desiredWidth = minWidth ? minWidth : 3840;
-	const toUpscalename = getTempScaleFolderName(inputPath);
-	const upscaledFolderName = `${inputPath}-upscaled`;
-	const actualOutput = outputPath ?? upscaledFolderName;
-	utils.createFolder(toUpscalename);
-	utils.createFolder(actualOutput);
-	utils.logLine();
-	const images = fs.readdirSync(inputPath);
-	const toUpscaleImages = fs.readdirSync(toUpscalename).map(utils.getFileNameWithoutExtension);
-	const upscaledImages = fs.readdirSync(actualOutput).map(utils.getFileNameWithoutExtension);
-	const doneImages = fs.readdirSync(actualOutput).map(utils.getFileNameWithoutExtension);
-	await Promise.all(images.map(async (imageName, index) => {
-		if(imageName.endsWith(".txt"))
-			{
-				return;
-			}		
- const nameWithoutExtension = utils.getFileNameWithoutExtension(imageName);
-		if(utils.isFolder(imageName)) {
-			return;
-		}
-		if(toUpscaleImages.indexOf(nameWithoutExtension) > -1 || upscaledImages.indexOf(nameWithoutExtension) > -1 || doneImages.indexOf(nameWithoutExtension) > -1) {
-			utils.logYellow(`${index+1} out of ${images.length}: ${nameWithoutExtension} already exists, skipping`);
-			return;
-		}
-		await sharp(path.join(inputPath, imageName))
-		  .metadata()
-		  .then(({ width, height }) => {
-				console.log(`${index+1} out of ${images.length}: ${imageName}`);
-				const shouldUpscale = minHeight ? height < minHeight : width < desiredWidth;
-				if(!shouldUpscale) {
-					console.log(`=> moving to upscaled folder`);
-					fs.writeFileSync(path.join(actualOutput, imageName), fs.readFileSync(path.join(inputPath, imageName)));
-				}
-				else {
-					console.log(`=> moving to upscale folder`);
-					fs.writeFileSync(path.join(toUpscalename, imageName), fs.readFileSync(path.join(inputPath, imageName)));
-				}
-	  	}
-	  );		
-	}))
-
-	utils.logLine();
-	upscaleFolderToOutput(toUpscalename, actualOutput, modelName);
-
-	// if(!outputPath) {
-	// 	utils.logLine();
-	// 	utils.deleteFolder(inputPath);
-	// 	utils.createFolder(inputPath);
-	
-	// 	utils.logLine();
-	// 	await convertFolderToJpg(upscaledFolderName, inputPath);
-	// }
-	// else {
-	// 	utils.logLine();
-	// 	utils.createFolder(outputPath);
-	
-	// 	utils.logLine();
-	// 	await convertFolderToJpg(upscaledFolderName, outputPath);
-	// }
-
-	utils.logLine();
-	// utils.deleteFolder(toUpscalename);
-	// utils.deleteFolder(upscaledFolderName);
-
-	utils.logLine();
-	utils.logGreen(`Finished upscaling ${inputPath}`);
-	return;
+export function getUpscaleRatio(desiredWidth: number, desiredHeight: number, imageWidth: number, imageHeight: number): number {
+	const widthRatio = desiredWidth / imageWidth;
+	const heightRatio = desiredHeight / imageHeight;
+	const chosenRatio = Math.max(widthRatio, heightRatio);
+	return Number((Math.ceil(chosenRatio*100)/100).toFixed(2))
 }
 
 export async function convertFolderToJpg(inputFolder:string, outputFolder:string) {
@@ -216,65 +151,4 @@ export async function upscalePS2(gameName: string) {
 
 	upscaleFolderToOutput(tempFolder, targetFolder, models.lady, true);
 	utils.deleteFolder(tempFolder);
-}
-
-// export async function upscaleScreenshots() {
-// 	const screenshotFolder = "E:/Pictures/Screenshots";
-// 	const screenshotFolderTemp = "E:/Pictures/zzScreenshots temp";
-// 	const outputFolder = "E:/Pictures/Screenshots upscaled";
-// 	const outputToDownscale = "E:/Pictures/zzScreenshots to downscale";
-// 	const folders = fs.readdirSync(screenshotFolder).filter((folder) => {return !folder.startsWith("zz")});
-
-// 	utils.execShell(`cp -R "${screenshotFolder}" "${screenshotFolderTemp}"`);
-// 	utils.execShell(`cp -R "${outputFolder}" "${outputToDownscale}"`);
-
-// 	for (let i = 0; i < folders.length; i++) {
-// 		const folderName = folders[i];
-// 		utils.logLine();
-// 		utils.logGreen("------------------------------------------");
-// 		utils.logGreen(`Upscaling ${folderName} ${i+1}/${folders.length}`);
-// 		utils.logGreen("------------------------------------------");
-// 		utils.logLine();
-// 		await upscaleFolder(path.join(screenshotFolderTemp, folderName), models.universalSharp, path.join(outputToDownscale, folderName), 3840);
-// 	}
-
-// 	for (let i = 0; i < folders.length; i++) {
-// 		const folderName = folders[i];
-// 		utils.logLine();
-// 		utils.logGreen("------------------------------------------");
-// 		utils.logGreen(`Downscaling ${folderName} ${i+1}/${folders.length}`);
-// 		utils.logGreen("------------------------------------------");
-// 		utils.logLine();
-// 		await downscaleFolder(path.join(outputToDownscale, folderName), path.join(outputFolder, folderName), 3840, 2160);
-// 	}
-// }
-
-export async function downscaleFolder(inputPath: string, outputPath: string, width: number, height: number) {
-	let x = 1;
-	utils.createFolder(outputPath);
-	const targetFiles = fs.readdirSync(inputPath);
-	const doneFiles = fs.readdirSync(outputPath);
-	await Promise.all(targetFiles.map(async (file) => {
-		try {
-			if(doneFiles.indexOf(file) > -1) {
-				x++;
-				return;
-			}
-			await sharp(path.join(inputPath, file))
-			.on("error", (err) => {
-				utils.logRed("on error"); 
-				utils.logRed(err.message);
-			})
-			.resize(width, height, {fit: "outside"})
-			.toFile(path.join(outputPath, file))
-			.then(() => {
-				utils.logYellow(`Downscaled ${x}/${targetFiles.length}: ${file}`);
-				x++;
-			});
-		} catch (error) {
-			utils.logRed("error catch");
-			utils.logRed(`while downscaling ${x}/${targetFiles.length}: ${file}`);
-			utils.logRed(error);
-		}
-	}))
 }
