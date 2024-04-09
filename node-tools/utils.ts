@@ -78,11 +78,11 @@ export async function removesFilesFromAifExistsInB(pathA:string, pathB:string, r
 	logGreen(`Deleted ${deletedFiles} from ${pathA}`);
 }
 
-export function createFolder(folderPath:string) {
+export function createFolder(folderPath:string, silent?: boolean) {
 	if (!fs.existsSync(folderPath)){
-		logYellow(`=> creating ${folderPath}`);
-    	fs.mkdirSync(folderPath, {recursive: true});
-    }
+		if(!silent) {logYellow(`=> creating ${folderPath}`);}
+		fs.mkdirSync(folderPath, {recursive: true});
+	}
 }
 
 export function openImageFolder(folderPath: string) {
@@ -101,9 +101,9 @@ export function randomImaginary() {
 	execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${chosenImagePath}"`, true);
 }
 
-export function deleteFolder(folderPath:string) {
+export function deleteFolder(folderPath:string, silent?: boolean) {
 	if (fs.existsSync(folderPath)){
-		logYellow(`=> deleting ${folderPath}`);
+		if(!silent) {logYellow(`=> deleting ${folderPath}`);}
     fs.rmSync(folderPath, { recursive: true, force: true });
   }
 }
