@@ -212,6 +212,9 @@ export async function cleanUnwanted() {
 			if(file.toLowerCase().includes("[lfa]")) {
 				shouldDelete = true;
 			}
+			if(file.endsWith(".txt")) {
+				shouldDelete = true;
+			}
 
 			if(!shouldDelete) {
 				return;
