@@ -133,7 +133,7 @@ export async function TestFolderUpscale() {
   console.log(`It took ${formatTimeStamp(diffTime/1000)} (or ${formatTimeStamp(diffTime/10000)} per image)`)
 }
 
-type UpscaleFolderOptions = {suffix?: string, useRatio?: boolean}
+type UpscaleFolderOptions = {suffix?: string, useRatio?: boolean, just2x?: boolean, just4x?: boolean, png?: boolean}
 //one by one version
 export async function upscaleFolderSDOneByOne(source: string, destination: string, model: Upscaler, width: number, height: number, options?: UpscaleFolderOptions) {
   const images = fs.readdirSync(source);
@@ -175,23 +175,33 @@ export async function upscaleFolderSDOneByOne(source: string, destination: strin
     logGreen(`Upscaling ${image}`);
 
     //case where user gives fixed dimensions to target
-    if(!options?.useRatio) {
-      upscaledImage = await singleUpscaleRequest(model, imagePath, {width, height});
+    if(options?.useRatio) {
+      const {width: imageWidth, height:imageHeight} = await sharp(imagePath).metadata();
+      const ratio = getUpscaleRatio(width, height, imageWidth, imageHeight);
+      upscaledImage = await singleUpscaleRequest(model, imagePath, {ratio});
+    }
+
+    //case where user just wants a 2x image
+    else if(options?.just2x) {
+      upscaledImage = await singleUpscaleRequest(model, imagePath, {ratio: 2});
+    }
+
+    //case where user just wants a 4x image
+    else if(options?.just4x) {
+      upscaledImage = await singleUpscaleRequest(model, imagePath, {ratio: 4});
     }
 
     //case where user gives an upscale ratio to target
     else {
-      const {width: imageWidth, height:imageHeight} = await sharp(imagePath).metadata();
-      const ratio = getUpscaleRatio(width, height, imageWidth, imageHeight);
-      upscaledImage = await singleUpscaleRequest(model, imagePath, {ratio});
+      upscaledImage = await singleUpscaleRequest(model, imagePath, {width, height});
     }
 
     //case where the API returns an error
     if(knownErrors.indexOf(upscaledImage) > -1) {
       createFolder(errorFolder);
       logYellow("Moving to error folder due to: " + upscaledImage);
-      const errorImagePath = `${destination}/${imageName}.jpg`;
-      await sharp(imagePath).toFormat("jpeg")
+      const errorImagePath = `${destination}/${imageName}.${options?.png ? "png": "jpg"}`;
+      await sharp(imagePath).toFormat(options?.png ? "png" : "jpeg")
       .jpeg({
         force: true
       }).toFile(errorImagePath);
@@ -208,7 +218,7 @@ export async function upscaleFolderSDOneByOne(source: string, destination: strin
     //processing the image
     imgBuffer = Buffer.from(upscaledImage.split(';base64,').pop(), 'base64');
     await sharp(imgBuffer)
-      .toFormat("jpeg")
+      .toFormat(options?.png ? "png" : "jpeg")
       .jpeg({
         force: true
       })
