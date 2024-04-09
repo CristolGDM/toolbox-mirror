@@ -3,7 +3,6 @@ import * as path from "path";
 
 const { execSync, exec } = require('child_process');
 
-const separatorBase = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
 export const NASPath = "//MOOMINLIBRARY";
 export const PicturesPath = `${NASPath}/pictures`;
 export const ImaginaryPath = `${PicturesPath}/imaginary-network`;
@@ -146,6 +145,12 @@ export function greenString(stringToLog:string) {
 
 export function yellowString(stringToLog:string) {
 	return `\x1b[93m${stringToLog}\x1b[0m`
+}
+
+export function formatTimeStamp(timestamp: number) {
+	const hours = timestamp > 3600 ? `${Math.trunc(timestamp/3600)}h` : "";
+	const minutes = timestamp > 60 ? `${Math.trunc((timestamp%3600)/60)}mn` : "";
+	return `${hours}${minutes}${Math.trunc(timestamp%60)}s`
 }
 
 export function execShell(command:string, isAsync?:boolean, customString?: string) {
