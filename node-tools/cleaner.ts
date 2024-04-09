@@ -16,7 +16,7 @@ export async function cleanImaginary(start: number) {
 
 		// deleteSimilar(subPath);
 		// utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
-		const results = deleteDuplicates(subPath).length/2;
+		const results = deleteDuplicates(subPath).length;
 		total += Math.ceil(results);
 		found.push({subName, amount: Math.ceil(results)});
 		utils.logBlue(`Currently at ${total} total duplicate found`);
@@ -48,7 +48,7 @@ export async function cleanDungeon(start: number) {
 
 		// const results1 = deleteSimilar(subPath).length/2;
 		// utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
-		const results2 = deleteDuplicates(subPath).length/2;
+		const results2 = deleteDuplicates(subPath).length;
 		// total += Math.ceil(results1);
 		total += Math.ceil(results2);
 		found.push({subName, amount: Math.ceil(results2)});
@@ -88,12 +88,12 @@ export async function cleanBeforeUpscale() {
 		foundDupes.map((dupe) => {knownDupes[dupe] = true});
 		const foundDupes2 = deleteSimilar(folder);
 		foundDupes2.map((dupe) => {knownDupes[dupe] = true});
-		const results = Math.ceil(foundDupes.length /2) + Math.ceil(foundDupes2.length /2);
+		const results = Math.ceil(foundDupes.length) + Math.ceil(foundDupes2.length);
 		found.push({subName: folderName, amount: Math.ceil(results)});
 		console.log(`Finished cleaning ${index+1}/${folders.length}`);
 	}
 	
-	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
+	// fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 	console.log("");
 	utils.logGreen("SUMMARY:");
 	found.filter(el => el.amount > 0).sort((a, b) => {return b.amount - a.amount}).forEach((element) => {
