@@ -165,6 +165,11 @@ export function execShell(command:string, isAsync?:boolean) {
 	execSync(command, {stdio:[0,1,2]});
 }
 
-export function separator(length:number) {
-	return separatorBase.substr(0, length);
+export function separator(length:number, altChar?: string) {
+	const usedChar = altChar ?? "-";
+	let returnString = "";
+	for (let index = 0; index < length; index++) {
+		returnString += usedChar;
+	}
+	return returnString;
 }
