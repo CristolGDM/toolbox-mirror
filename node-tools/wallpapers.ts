@@ -25,7 +25,7 @@ const wallpaperToUpscaleMobile = upscaler.getTempScaleFolderName(mobileTemp);
 const outputSemiFinal = `${localPicturesPath}/desk-totransfer`;
 const outputMobileSemiFinal = `${localPicturesPath}/mob-totransfer`;
 
-const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi", "gifv"];
+export const forbiddenExtensions = ["mp4", "gif", "mkv", "m4u", "txt", "avi", "gifv"];
 
 export const knownDupesPath = `${NASPath}/pictures/knownDupes.json`;
 
@@ -79,30 +79,37 @@ export async function filterBigEnough(sourceFolder: string, folderIfBig: string,
 		const image = images[index];
 		const imagePath = path.join(sourceFolder, image);
 		const logPrefix = `${index+1}/${images.length}: ${image}`;
+    progressBar.update(index+1);
+
+		if(forbiddenExtensions.some((extension) => {return image.endsWith(extension)})) {
+			utils.deleteFolder(imagePath);
+			utils.logYellow("=> wrong file extension, skipping");
+			continue;
+		}
+
 		if(fs.existsSync(path.join(folderIfSmall, image)) || fs.existsSync(path.join(folderIfBig, utils.getFileNameWithoutExtension(image)+".jpg"))) {
 			done.push({name: image, isExists: true});
 			utils.logRed(`${logPrefix} => already exists`);
+			continue;
+		}
+
+		utils.logYellow(`${logPrefix} => need to upscale`);
+		const {width, height} = await sharp(imagePath).metadata();
+		if(width < targetWidth || height < targetHeight) {
+			done.push({name: image, isBig: false});
+			fs.writeFileSync(path.join(folderIfSmall, image), fs.readFileSync(imagePath));
 		}
 		else {
-			utils.logYellow(`${logPrefix} => need to upscale`);
-			const {width, height} = await sharp(imagePath).metadata();
-			if(width < targetWidth || height < targetHeight) {
-				done.push({name: image, isBig: false});
-				fs.writeFileSync(path.join(folderIfSmall, image), fs.readFileSync(imagePath));
-			}
-			else {
-				done.push({name: image, isBig: true});
-				utils.logBlue(`${logPrefix} => already big enough`);
-				await sharp(imagePath)
-					.toFormat("jpeg")
-					.jpeg({
-						force: true,
-					})
-					.resize(targetWidth, targetHeight, {fit: "outside"})
-					.toFile(path.join(folderIfBig, utils.getFileNameWithoutExtension(image)+".jpg"))
-			}
+			done.push({name: image, isBig: true});
+			utils.logBlue(`${logPrefix} => already big enough`);
+			await sharp(imagePath)
+				.toFormat("jpeg")
+				.jpeg({
+					force: true,
+				})
+				.resize(targetWidth, targetHeight, {fit: "outside"})
+				.toFile(path.join(folderIfBig, utils.getFileNameWithoutExtension(image)+".jpg"))
 		}
-    progressBar.update(index+1);
 	}
   progressBar.update(images.length);
 	console.log("");
