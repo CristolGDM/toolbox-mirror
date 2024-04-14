@@ -1,8 +1,9 @@
 import * as fs from "fs";
 import * as utils from "./utils";
 import { subs as otherSubs } from "./assets/other-subs";
-import { getDungeonFolders, getFinalFolders, getImaginaryFolders, getUpscaleFolders, knownDupesPath } from "./wallpapers";
+import { forbiddenExtensions, getDungeonFolders, getFinalFolders, getImaginaryFolders, getUpscaleFolders, knownDupesPath } from "./wallpapers";
 import path = require("path");
+import * as sharp from "sharp";
 
 export async function cleanImaginary(start: number) {
 	const subs = getImaginaryFolders();
@@ -14,11 +15,11 @@ export async function cleanImaginary(start: number) {
 		const subName = path.basename(subPath);
 		utils.logBlue(`Cleaning (${i+1}/${subs.length}): ${subPath}`);
 
-		// deleteSimilar(subPath);
-		// utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
-		const results = deleteDuplicates(subPath).length;
-		total += Math.ceil(results);
-		found.push({subName, amount: Math.ceil(results)});
+		const results1 = deleteSimilar(subPath).length/2;
+		utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
+		const results2 = deleteDuplicates(subPath).length;
+		total += Math.ceil(results1);
+		found.push({subName, amount: Math.ceil(results1+results2)});
 		utils.logBlue(`Currently at ${total} total duplicate found`);
 		console.log("");
 		console.log("------------------------------------------------------------------------------------");
@@ -46,12 +47,12 @@ export async function cleanDungeon(start: number) {
 		const subName = path.basename(subPath);
 		utils.logBlue(`Cleaning (${i+1}/${subs.length}): ${subPath}`);
 
-		// const results1 = deleteSimilar(subPath).length/2;
-		// utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
+		const results1 = deleteSimilar(subPath).length/2;
+		utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
 		const results2 = deleteDuplicates(subPath).length;
-		// total += Math.ceil(results1);
+		total += Math.ceil(results1);
 		total += Math.ceil(results2);
-		found.push({subName, amount: Math.ceil(results2)});
+		found.push({subName, amount: Math.ceil(results1+results2)});
 		utils.logBlue(`Currently at ${total} total duplicate found`);
 		console.log("");
 		console.log("------------------------------------------------------------------------------------");
@@ -93,7 +94,7 @@ export async function cleanBeforeUpscale() {
 		console.log(`Finished cleaning ${index+1}/${folders.length}`);
 	}
 	
-	// fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
+	fs.writeFileSync(knownDupesPath, JSON.stringify(knownDupes, null, 2));
 	console.log("");
 	utils.logGreen("SUMMARY:");
 	found.filter(el => el.amount > 0).sort((a, b) => {return b.amount - a.amount}).forEach((element) => {
@@ -137,8 +138,8 @@ export function cleanOthers() {
 			continue;
 		}
 		deleteDuplicates(folder);
-		// deleteSimilar(folder);
-		// deleteSimilar(folder, true);
+		deleteSimilar(folder);
+		deleteSimilar(folder, true);
 		console.log(`Finished cleaning ${index+1}/${folders.length}`)
 	}
 }
@@ -162,7 +163,6 @@ export function deleteDuplicates(folderPath:string) {
 											.filter(file => file.indexOf(folder) > -1)
 											.map(file => path.parse(file.split(folder)[1]).name);
 
-	// deleteFolder(logFile);
 	console.timeEnd(timerName);
 	return filesFound;
 }
@@ -205,7 +205,8 @@ export function deleteSimilar(folderPath:string, video?: boolean) {
 		const files = [...group];
 		files.shift();
 		files.forEach((file) => {
-			utils.deleteFolder(file);
+			console.log("Should delete " + file);
+			utils.deleteFolder(path.join(...file.split("\\")).replace(/\"/g, "").replace("moominlibrary", "\\moominlibrary"), {verbose: true});
 			deleted++;
 		})
 	});
