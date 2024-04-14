@@ -250,6 +250,6 @@ export function getFinalFolders() {
 export function sendUpscaledToLibrary() {
 	utils.createFolder(outputFinal);
 	utils.createFolder(outputMobile);
-	utils.execShell(`rclone sync "${outputSemiFinal}" "${outputFinal}" --progress --transfers=20`);
-	utils.execShell(`rclone sync "${outputMobileSemiFinal}" "${outputMobile}" --progress --transfers=20`);
+	utils.execShell(`rclone copyto "${outputSemiFinal}" "${outputFinal}" --progress --transfers=10`);
+	utils.execShell(`rclone copyto "${outputMobileSemiFinal}" "${outputMobile}" --progress --transfers=10`);
 }
