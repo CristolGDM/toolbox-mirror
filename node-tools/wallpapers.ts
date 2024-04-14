@@ -175,6 +175,10 @@ export async function sortAll() {
 				.metadata()
 				.then(({ width, height }) => {
 					console.log(`${folderLog} - ${index} out of ${images.length}: ${image}`);
+					if(width/height > 4 || height/width > 4) {
+						console.log("=> ratio above 4:1, skipping");
+						return;
+					}
 					if(width/4 >= height/3) {
 						if(image.toLowerCase().startsWith("verticalwallpapers")) {
 							console.log("=> desktop sized mobile wallpaper");
