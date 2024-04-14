@@ -260,7 +260,7 @@ export async function upscaleFolderSD(source: string, destination: string, model
   for (let index = 0; index < images.length; index+=BATCH_SIZE) {
     const imageGroup = images.slice(index, index+BATCH_SIZE);
     let numberOfImages = 0;
-    deleteFolder(processingFolder, true);
+    deleteFolder(processingFolder, {silent: true});
     createFolder(processingFolder, true);
 
     await Promise.all(imageGroup.map(async (image) => {

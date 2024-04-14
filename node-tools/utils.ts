@@ -82,11 +82,15 @@ export function randomImaginary() {
 	execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${chosenImagePath}"`, true);
 }
 
-export function deleteFolder(folderPath:string, silent?: boolean) {
-	if (fs.existsSync(folderPath)){
-		if(!silent) {logYellow(`=> deleting ${folderPath}`);}
+export function deleteFolder(folderPath:string, options?: {silent?: boolean, verbose?: boolean}) {
+	const fileExists = fs.existsSync(folderPath);
+	if (fileExists){
+		if(!options.silent) {logYellow(`=> deleting ${folderPath}`);}
     fs.rmSync(folderPath, { recursive: true, force: true });
   }
+	if(!fileExists && options.verbose) {
+		logRed(`Couldn't find ${folderPath}`);
+	}
 }
 
 export function isFolder(path:string) {
