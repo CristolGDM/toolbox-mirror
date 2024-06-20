@@ -16,9 +16,10 @@ export async function cleanImaginary(start: number) {
 		utils.logBlue(`Cleaning (${i+1}/${subs.length}): ${subPath}`);
 
 		const results1 = deleteSimilar(subPath).length/2;
+		total += Math.ceil(results1);
 		utils.logBlue(`Still doing (${i+1}/${subs.length}): ${subPath}...`);
 		const results2 = deleteDuplicates(subPath).length;
-		total += Math.ceil(results1);
+		total += Math.ceil(results2);
 		found.push({subName, amount: Math.ceil(results1+results2)});
 		utils.logBlue(`Currently at ${total} total duplicate found`);
 		console.log("");
