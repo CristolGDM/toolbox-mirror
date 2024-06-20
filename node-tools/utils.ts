@@ -75,11 +75,15 @@ export function randomImaginary() {
 	const imaginaryFolders = fs.readdirSync(ImaginaryPath).filter((folder) => {return folder.indexOf(".") === -1});
 	const chosenFolder = imaginaryFolders[Math.floor(Math.random()*imaginaryFolders.length)];
 	const chosenFolderPath = `${ImaginaryPath}/${chosenFolder}`;
+	randomFromFolder(chosenFolderPath);
+}
 
-	const images = fs.readdirSync(chosenFolderPath);
+export function randomFromFolder(folderPath: string) {
+	const images = fs.readdirSync(folderPath);
 	const chosenImage = images[Math.floor(Math.random()*images.length)];
-	const chosenImagePath = `${chosenFolderPath}/${chosenImage}`
-	execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${chosenImagePath}"`, true);
+	const chosenImagePath = `${folderPath}/${chosenImage}`
+	execShell(`"${chosenImagePath}"`, true);
+	// execShell(`"C:/Program Files/XnViewMP/xnviewmp.exe" "${chosenImagePath}"`, true);
 }
 
 export function deleteFolder(folderPath:string, options?: {silent?: boolean, verbose?: boolean}) {
