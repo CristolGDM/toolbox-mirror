@@ -206,7 +206,7 @@ export function deleteSimilar(folderPath:string, video?: boolean) {
 		files.shift();
 		files.forEach((file) => {
 			console.log("Should delete " + file);
-			utils.deleteFolder(path.join(...file.split("\\")).replace(/\"/g, "").replace("moominlibrary", "\\moominlibrary"), {verbose: true});
+			utils.deleteFolder(path.join(...file.split("\\")).replace(/\"/g, "").replaceAll("\\'", "'").replace("moominlibrary", "\\moominlibrary"), {verbose: true});
 			deleted++;
 		})
 	});
