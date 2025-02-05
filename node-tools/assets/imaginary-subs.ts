@@ -58,6 +58,7 @@ export const subs: bdfrSection = {
 	planes: { subreddits: "ImaginaryAviation" },
 	vehicles: { subreddits: "ImaginaryVehicles" },
 	boats: { subreddits: "Imaginaryvessels" },
+	trains: { subreddits: "ImaginaryTrains"},
 	warships: { subreddits: "ImaginaryWarships" },
 
    //
