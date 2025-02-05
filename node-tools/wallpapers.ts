@@ -97,7 +97,7 @@ export async function filterBigEnough(sourceFolder: string, folderIfBig: string,
 		const {width, height} = await sharp(imagePath).metadata();
 		if(width < targetWidth || height < targetHeight) {
 			done.push({name: image, isBig: false});
-			fs.writeFileSync(path.join(folderIfSmall, image), fs.readFileSync(imagePath));
+			fs.writeFileSync(path.join(folderIfSmall, image), fs.readFileSync(imagePath, "base64"));
 		}
 		else {
 			done.push({name: image, isBig: true});
@@ -196,7 +196,7 @@ export async function sortAll() {
 							return;
 						}
 						utils.logGreen("=> moving to desktop");
-						fs.writeFileSync(path.join(wallpaperTemp, image), fs.readFileSync(path.join(folderPath, image)));
+						fs.writeFileSync(path.join(wallpaperTemp, image), fs.readFileSync(path.join(folderPath, image), "base64"));
 					}
 					else if(height/4 >= width/3) {
 						if(height < 800 || width < 300) {
@@ -204,7 +204,7 @@ export async function sortAll() {
 							return;
 						}
 						utils.logGreen("=> moving to mobile");
-						fs.writeFileSync(path.join(mobileTemp, image), fs.readFileSync(path.join(folderPath, image)));
+						fs.writeFileSync(path.join(mobileTemp, image), fs.readFileSync(path.join(folderPath, image), "base64"));
 					}
 					else {
 						console.log("=> wrong ratio, skipping");

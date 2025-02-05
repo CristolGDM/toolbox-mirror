@@ -270,7 +270,7 @@ export async function upscaleFolderSD(source: string, destination: string, model
         return;
       }
 
-      fs.writeFileSync((path.join(processingFolder, image)), fs.readFileSync(path.join(source, image)));
+      fs.writeFileSync((path.join(processingFolder, image)), fs.readFileSync(path.join(source, image), "base64"));
       numberOfImages++;
     }))
 

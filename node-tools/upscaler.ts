@@ -62,7 +62,7 @@ export async function convertFolderToJpg(inputFolder:string, outputFolder:string
 		}
 		if(!(image.endsWith(".png") || image.endsWith(".webp") || image.endsWith(".bmp"))) {
 			utils.logBlue(`=> ${indexText} cannot be converted, moving as is`);
-			fs.writeFileSync(path.join(outputFolder, image), fs.readFileSync(path.join(inputFolder, image)));
+			fs.writeFileSync(path.join(outputFolder, image), fs.readFileSync(path.join(inputFolder, image), "base64"));
 			return;
 		}
 
@@ -107,7 +107,7 @@ export async function upscalePSX(gameName:string) {
 		console.log(`${i+1} out of ${images.length}: ${imageName}`);
 
 		console.log("=> Moving to upscale folder");
-		fs.writeFileSync(path.join(tempFolder, imageName), fs.readFileSync(path.join(dumpFolder, imageName)));
+		fs.writeFileSync(path.join(tempFolder, imageName), fs.readFileSync(path.join(dumpFolder, imageName), "base64"));
 	}
 
 	upscaleFolderToOutput(tempFolder, targetFolder, models.lady, true);
@@ -144,7 +144,7 @@ export async function upscalePS2(gameName: string) {
 		console.log(`${i+1} out of ${images.length}: ${imageName}`);
 
 		console.log("=> Moving to upscale folder");
-		fs.writeFileSync(path.join(tempFolder, imageName), fs.readFileSync(path.join(dumpFolder, imageName)));
+		fs.writeFileSync(path.join(tempFolder, imageName), fs.readFileSync(path.join(dumpFolder, imageName), "base64"));
 	}
 
 	upscaleFolderToOutput(tempFolder, targetFolder, models.lady, true);

@@ -108,7 +108,7 @@ export function generateArtPreviews() {
 		console.log(utils.separator(18));
 	
 		const originalPictureName = files.find(file => file.startsWith("001"));
-		const originalPicture = fs.readFileSync(`${nhUsedFolder}/${folder}/${originalPictureName}`)
+		const originalPicture = fs.readFileSync(`${nhUsedFolder}/${folder}/${originalPictureName}`, "base64")
 		if(!originalPicture) {
 			console.error("no picture");
 			return;
@@ -170,7 +170,7 @@ export function sortArt() {
 	
 		files.forEach((file) => {
 			console.log(`${file}...`)
-			fs.writeFileSync(path.join(newPath, file), fs.readFileSync(path.join(downloadedFolder, file)))
+			fs.writeFileSync(path.join(newPath, file), fs.readFileSync(path.join(downloadedFolder, file), "base64"))
 		});
 
 		utils.logGreen(`Finished migrating ${newTitle}`);
